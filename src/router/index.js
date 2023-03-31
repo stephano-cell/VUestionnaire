@@ -36,7 +36,7 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to, from, next) => {
-    const isAuthenticated = false;
+    const isAuthenticated = true;
     if (to.name !== "login" && !isAuthenticated) next({ name: "login" });
     else next();
   });

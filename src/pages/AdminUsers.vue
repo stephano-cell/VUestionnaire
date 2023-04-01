@@ -33,7 +33,7 @@
               :rows="rows"
               :columns="columns"
               row-key="name"
-              selection="multiple"
+              selection="single"
               v-model:selected="selected"
               v-model:pagination="pagination"
               :filter="filter"
@@ -54,9 +54,19 @@
                   </template>
                 </q-input>
               </template>
+              <template v-slot:body-cell-assigned_projects="props">
+                <q-td :props="props">
+                  <q-select
+                    v-if="props.row.role !== 'admin'"
+                    v-model="props.row.selected_project"
+                    :options="props.row.assigned_projects"
+                  />
+                  <span v-else>-</span>
+                </q-td>
+              </template>
               <template v-slot:body-cell-edit="props">
                 <q-td :props="props">
-                  <q-btn flat icon="edit" @click="editSelected(props.row)" />
+                  <q-btn flat icon="edit" @click="editRow(props.row)" />
                 </q-td>
               </template>
             </q-table>
@@ -69,6 +79,7 @@
 
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
+import { QSelect } from "quasar";
 
 const columns = [
   {
@@ -95,6 +106,13 @@ const columns = [
     name: "assigned_projects",
     label: "Assigned Projects",
     field: "assigned_projects",
+    format: (val) => {
+      if (val && val.length > 0) {
+        return `<q-select :options="${JSON.stringify(val)}" />`;
+      } else {
+        return "-";
+      }
+    },
   },
   { name: "role", label: "role", field: "role", sortable: true },
 
@@ -107,7 +125,7 @@ const columns = [
   },
 ];
 
-const rows = [
+const rowsData = [
   {
     id: 1,
     name: "sm",
@@ -126,6 +144,15 @@ const rows = [
     role: "user",
   },
 ];
+const rows = rowsData.map((row) => {
+  if (row.assigned_projects && row.assigned_projects.length > 0) {
+    return {
+      ...row,
+      selected_project: row.assigned_projects[0], // Initialize with the first project in the array
+    };
+  }
+  return row;
+});
 
 export default {
   setup() {
@@ -244,6 +271,9 @@ export default {
         }
       },
     };
+  },
+  components: {
+    QSelect,
   },
 };
 </script>

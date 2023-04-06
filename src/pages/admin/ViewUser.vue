@@ -52,7 +52,6 @@
         v-model="allowLogin"
         label="Allow login"
       />
-
       <template v-if="role === 'client'">
         <q-select
           filled
@@ -64,6 +63,8 @@
           map-options
           option-value="name"
           option-label="name"
+          filter
+          filter-placeholder="Search projects"
         />
       </template>
 
@@ -116,7 +117,12 @@ export default {
     const role = ref(null);
     const allowLogin = ref(false);
     const project = ref([]);
-    const projects = [{ name: "test1" }, { name: "test2" }, { name: "test3" }];
+    const projects = [
+      { name: "astesttest1" },
+      { name: "stephanos" },
+      { name: "aristos" },
+      { name: "spiderman" },
+    ];
 
     const roles = [
       { label: "admin", value: "admin" },

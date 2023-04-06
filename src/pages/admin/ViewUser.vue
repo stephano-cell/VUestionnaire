@@ -53,6 +53,20 @@
         label="Allow login"
       />
 
+      <template v-if="role === 'client'">
+        <q-select
+          filled
+          v-model="project"
+          label="Project *"
+          :options="projects"
+          multiple
+          emit-value
+          map-options
+          option-value="name"
+          option-label="name"
+        />
+      </template>
+
       <q-input
         filled
         v-model="password"
@@ -101,6 +115,8 @@ export default {
     const password = ref(null);
     const role = ref(null);
     const allowLogin = ref(false);
+    const project = ref([]);
+    const projects = [{ name: "test1" }, { name: "test2" }, { name: "test3" }];
 
     const roles = [
       { label: "admin", value: "admin" },
@@ -116,6 +132,8 @@ export default {
       role,
       roles,
       allowLogin,
+      project, // add project ref
+      projects, // add projects options
 
       onSubmit() {
         $q.notify({
@@ -132,6 +150,7 @@ export default {
         email.value = null;
         companyName.value = null;
         password.value = null;
+        project.value = []; // add project reset
       },
     };
   },

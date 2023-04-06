@@ -6,26 +6,62 @@
     <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
       <q-input
         filled
-        v-model="name"
-        label="Your name *"
-        hint="Name and surname"
+        v-model="username"
+        label="username *"
+        hint="username"
         lazy-rules
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
 
       <q-input
         filled
-        type="number"
-        v-model="age"
-        label="Your age *"
+        v-model="fullName"
+        label="Full Name *"
+        hint="Name and surname"
         lazy-rules
-        :rules="[
-          (val) => (val !== null && val !== '') || 'Please type your age',
-          (val) => (val > 0 && val < 100) || 'Please type a real age',
-        ]"
+        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      />
+      <q-input
+        filled
+        v-model="email"
+        type="email"
+        label="e-mail *"
+        hint="type email"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      />
+      <q-input
+        filled
+        v-model="companyName"
+        label="Company Name *"
+        hint="copmany name"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
 
-      <q-toggle v-model="accept" label="I accept the license and terms" />
+      <q-select
+        filled
+        v-model="role"
+        label="Role *"
+        :options="roles"
+        emit-value
+        map-options
+      />
+      <q-checkbox
+        v-if="role !== 'admin'"
+        v-model="allowLogin"
+        label="Allow login"
+      />
+
+      <q-input
+        filled
+        v-model="password"
+        type="password"
+        label="password *"
+        hint="Type a secure password 8+ characters"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 7) || 'Please type something']"
+      />
 
       <div>
         <q-btn label="Submit" type="submit" color="primary" />
@@ -58,36 +94,44 @@ export default {
   },
   setup() {
     const $q = useQuasar();
-    const name = ref(null);
-    const age = ref(null);
-    const accept = ref(false);
+    const username = ref(null);
+    const fullName = ref(null);
+    const email = ref(null);
+    const companyName = ref(null);
+    const password = ref(null);
+    const role = ref(null);
+    const allowLogin = ref(false);
+
+    const roles = [
+      { label: "admin", value: "admin" },
+      { label: "client", value: "client" },
+    ];
+
     return {
-      name,
-      age,
-      accept,
+      username,
+      fullName,
+      email,
+      companyName,
+      password,
+      role,
+      roles,
+      allowLogin,
 
       onSubmit() {
-        if (accept.value !== true) {
-          $q.notify({
-            color: "red-5",
-            textColor: "white",
-            icon: "warning",
-            message: "You need to accept the license and terms first",
-          });
-        } else {
-          $q.notify({
-            color: "green-4",
-            textColor: "white",
-            icon: "cloud_done",
-            message: "Submitted",
-          });
-        }
+        $q.notify({
+          color: "green-4",
+          textColor: "white",
+          icon: "cloud_done",
+          message: "Submitted",
+        });
       },
 
       onReset() {
-        name.value = null;
-        age.value = null;
-        accept.value = false;
+        username.value = null;
+        fullName.value = null;
+        email.value = null;
+        companyName.value = null;
+        password.value = null;
       },
     };
   },

@@ -35,7 +35,7 @@
         <template v-slot:body-cell-assigned_projects="props">
           <q-td :props="props">
             <q-select
-              v-if="props.row.role !== 'admin'"
+              v-if="props.row.role == 'client'"
               v-model="props.row.selected_project"
               :options="props.row.assigned_projects"
             />
@@ -116,7 +116,7 @@ const rowsData = [
     company: "VUbiquity2",
     email: "s.massouras2@vu.com",
     assigned_projects: ["project1", "project2"],
-    role: "user",
+    role: "client",
   },
 ];
 const rows = rowsData.map((row) => {

@@ -39,6 +39,15 @@
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
 
+      <q-input
+        filled
+        v-model="password"
+        type="password"
+        label="password *"
+        hint="Type a secure password 8+ characters"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 7) || 'Please type something']"
+      />
       <q-select
         filled
         v-model="role"
@@ -56,7 +65,7 @@
         <q-select
           filled
           v-model="project"
-          label="Project *"
+          label="Project"
           :options="projects"
           multiple
           emit-value
@@ -67,16 +76,6 @@
           filter-placeholder="Search projects"
         />
       </template>
-
-      <q-input
-        filled
-        v-model="password"
-        type="password"
-        label="password *"
-        hint="Type a secure password 8+ characters"
-        lazy-rules
-        :rules="[(val) => (val && val.length > 7) || 'Please type something']"
-      />
 
       <div>
         <q-btn label="Submit" type="submit" color="primary" />

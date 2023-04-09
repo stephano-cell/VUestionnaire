@@ -23,8 +23,17 @@ const routes = [
           id: route.params.id,
         }),
       },
+      {
+        path: "/admin/projects",
+        component: () => import("pages/admin/ListProjects.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
     ],
   },
+
   {
     path: "/login",
     name: "login",

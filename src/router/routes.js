@@ -31,6 +31,10 @@ const routes = [
           id: route.params.id,
         }),
       },
+      {
+        path: "/admin/groups",
+        component: () => import("pages/admin/ViewGroups.vue"),
+      },
     ],
   },
 

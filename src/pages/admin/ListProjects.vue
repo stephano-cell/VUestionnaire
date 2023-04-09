@@ -11,7 +11,6 @@
         :rows="rows"
         :columns="columns"
         row-key="name"
-        selection="single"
         v-model:selected="selected"
         v-model:pagination="pagination"
         :filter="filter"
@@ -32,14 +31,12 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body-cell-assigned_projects="props">
+        <template v-slot:body-cell-assigned_clients="props">
           <q-td :props="props">
             <q-select
-              v-if="props.row.role == 'client'"
-              v-model="props.row.selected_project"
-              :options="props.row.assigned_projects"
+              v-model="props.row.selected_clients"
+              :options="props.row.assigned_clients"
             />
-            <span v-else>-</span>
           </q-td>
         </template>
         <template v-slot:body-cell-edit="props">
@@ -58,29 +55,33 @@ import { QSelect } from "quasar";
 
 const columns = [
   {
-    name: "yiki",
-    required: true,
-    label: "username",
-    align: "left",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-
-  {
-    name: "fullname",
+    name: "projectName",
     align: "center",
-    label: "Full Name",
-    field: "fullname",
+    label: "Project Name",
+    field: "projectName",
     sortable: true,
   },
-  { name: "email", label: "email", field: "email" },
-  { name: "company", label: "Company", field: "company", sortable: true },
+  {
+    name: "account_manager",
+    align: "center",
+    label: "Account Manager",
+    field: "account_manager",
+    sortable: true,
+  },
 
   {
-    name: "assigned_projects",
-    label: "Assigned Projects",
-    field: "assigned_projects",
+    name: "comments",
+    align: "center",
+    label: "comments",
+    field: "comments",
+    sortable: true,
+  },
+
+  { name: "company", label: "Company", field: "company", sortable: true },
+  {
+    name: "assigned_clients",
+    label: "Assigned Clients",
+    field: "assigned_clients",
     format: (val) => {
       if (val && val.length > 0) {
         return `<q-select :options="${JSON.stringify(val)}" />`;
@@ -89,8 +90,42 @@ const columns = [
       }
     },
   },
-  { name: "role", label: "role", field: "role", sortable: true },
 
+  {
+    name: "last_client_activity",
+    align: "center",
+    label: "last_client_activity",
+    field: "last_client_activity",
+    sortable: true,
+  },
+  {
+    name: "client_remaining_questions",
+    align: "center",
+    label: "Client:Remaining Question",
+    field: "client_remaining_questions",
+    sortable: true,
+  },
+  {
+    name: "last_admin_activity",
+    align: "center",
+    label: "last_admin_activity",
+    field: "last_admin_activity",
+    sortable: true,
+  },
+  {
+    name: "admin_remaining_review",
+    align: "center",
+    label: "Admin:remaining to review",
+    field: "admin_remaining_reviewed",
+    sortable: true,
+  },
+  {
+    name: "status",
+    align: "center",
+    label: "status",
+    field: "status",
+    sortable: true,
+  },
   {
     name: "edit",
     label: "",
@@ -103,27 +138,40 @@ const columns = [
 const rowsData = [
   {
     id: 1,
-    name: "sm",
-    fullname: "Stephanos Massouras",
-    company: "VUbiquity",
-    email: "s.massouras@vubqiquity.com",
-    role: "admin",
+    projectName: "Tvod SVOD",
+
+    company: "Plex",
+    account_manager: "Aris",
+    comments: "This project is for this company which is bla bla previously sf",
+    assigned_clients: ["satephanos", "asdfasfe"],
+
+    last_client_activity: "2023-03-01",
+    client_remaining_questions: "20",
+    last_admin_activity: "2023-03-02",
+    admin_remaining_reviewed: "10",
+    status: "completed: 50%",
   },
   {
-    id: 2,
-    name: "sm2",
-    fullname: "Stephanos 2",
-    company: "VUbiquity2",
-    email: "s.massouras2@vu.com",
-    assigned_projects: ["project1", "project2"],
-    role: "client",
+    id: 1,
+    projectName: "Tvod EST SVOD",
+
+    company: "Spidernet",
+    account_manager: "Naruto",
+    comments: "Testing for fund",
+    assigned_clients: ["satephanos", "hello"],
+
+    last_client_activity: "2022-03-01",
+    client_remaining_questions: "23",
+    last_admin_activity: "2023-03-03",
+    admin_remaining_reviewed: "12",
+    status: "completed: 60%",
   },
 ];
 const rows = rowsData.map((row) => {
-  if (row.assigned_projects && row.assigned_projects.length > 0) {
+  if (row.assigned_clients && row.assigned_clients.length > 0) {
     return {
       ...row,
-      selected_project: row.assigned_projects[0], // Initialize with the first project in the array
+      selected_clients: row.assigned_clients[0], // Initialize with the first project in the array
     };
   }
   return row;

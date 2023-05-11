@@ -22,18 +22,7 @@
             selected-color="primary"
             v-model:selected="selected"
             default-expand-all
-          />
-          <q-btn
-            label="Edit Group"
-            color="warning"
-            @click="showEditGroupDialog = true"
-            class="q-mb-md"
-          />
-          <q-btn
-            label="Edit Question"
-            color="warning"
-            @click="showEditQuestionDialog = true"
-            class="q-mb-md"
+            @dblclick="editSelected"
           />
           <q-btn
             label="Delete Group"
@@ -289,6 +278,18 @@ export default {
   setup() {
     const splitterModel = ref(50);
     const selected = ref("Food");
+    const editSelected = () => {
+      const group = groups.value.find((g) => g.label === selected.value);
+      if (group) {
+        // The selected node is a group
+        selectedGroupToEdit.value = selected.value;
+        showEditGroupDialog.value = true;
+      } else {
+        // The selected node is a question
+        selectedQuestionToEdit.value = selected.value;
+        showEditQuestionDialog.value = true;
+      }
+    };
 
     const groups = ref([
       {
@@ -522,6 +523,7 @@ export default {
       selectedQuestionToDelete,
       deleteGroup,
       deleteQuestion,
+      editSelected,
     };
   },
 };

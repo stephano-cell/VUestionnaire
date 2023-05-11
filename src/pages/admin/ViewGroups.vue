@@ -380,6 +380,10 @@ export default {
         if (question) {
           question.label = newQuestionTitle.value;
           question.description = newQuestionDescription.value;
+
+          // Sort the questions alphabetically within the group.
+          group.children.sort((a, b) => a.label.localeCompare(b.label));
+
           newQuestionTitle.value = "";
           newQuestionDescription.value = "";
           selectedQuestionToEdit.value = "";
@@ -459,6 +463,9 @@ export default {
           label: questionTitle.value,
           description: questionDescription.value,
         });
+
+        // Sort the questions alphabetically within the group.
+        group.children.sort((a, b) => a.label.localeCompare(b.label));
 
         questionTitle.value = "";
         questionDescription.value = "";

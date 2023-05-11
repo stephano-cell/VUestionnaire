@@ -9,8 +9,19 @@ const routes = [
         component: () => import("pages/admin/ListUsers.vue"),
       },
       {
+        path: "/admin/projects",
+        component: () => import("pages/admin/ListProjects.vue"),
+      },
+      {
         path: "/admin/new",
         component: () => import("pages/admin/ViewUser.vue"),
+        props: () => ({
+          mode: "new",
+        }),
+      },
+      {
+        path: "/admin/new_project",
+        component: () => import("pages/admin/ViewProjects.vue"),
         props: () => ({
           mode: "new",
         }),
@@ -23,14 +34,7 @@ const routes = [
           id: route.params.id,
         }),
       },
-      {
-        path: "/admin/projects",
-        component: () => import("pages/admin/ListProjects.vue"),
-        props: (route) => ({
-          mode: "edit",
-          id: route.params.id,
-        }),
-      },
+
       {
         path: "/admin/groups",
         component: () => import("pages/admin/ViewGroups.vue"),

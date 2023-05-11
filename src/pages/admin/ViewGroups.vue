@@ -38,7 +38,7 @@
             :name="node.label"
           >
             <div class="text-h4 q-mb-md">{{ node.label }}</div>
-            <p>{{ node.description }}</p>
+            <p v-html="node.description"></p>
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -65,12 +65,94 @@
           <div class="text-h6">Create a new question</div>
         </q-card-section>
         <q-card-section>
-          <q-input filled v-model="questionName" label="Question Name" />
+          <q-input filled v-model="questionTitle" label="Question Title" />
           <q-select
             filled
-            v-model="questionGroup"
+            v-model="selectedGroup"
             :options="groupOptions"
-            label="Group"
+            label="Select a group"
+          />
+          <q-editor
+            filled
+            v-model="questionDescription"
+            label="Question Description"
+            :dense="$q.screen.lt.md"
+            :toolbar="[
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  options: ['left', 'center', 'right', 'justify'],
+                },
+              ],
+              [
+                'bold',
+                'italic',
+                'strike',
+                'underline',
+                'subscript',
+                'superscript',
+              ],
+              ['token', 'hr', 'link', 'custom_btn'],
+              ['print', 'fullscreen'],
+              [
+                {
+                  label: $q.lang.editor.formatting,
+                  icon: $q.iconSet.editor.formatting,
+                  list: 'no-icons',
+                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code'],
+                },
+                {
+                  label: $q.lang.editor.fontSize,
+                  icon: $q.iconSet.editor.fontSize,
+                  fixedLabel: true,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'size-1',
+                    'size-2',
+                    'size-3',
+                    'size-4',
+                    'size-5',
+                    'size-6',
+                    'size-7',
+                  ],
+                },
+                {
+                  label: $q.lang.editor.defaultFont,
+                  icon: $q.iconSet.editor.font,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'default_font',
+                    'arial',
+                    'arial_black',
+                    'comic_sans',
+                    'courier_new',
+                    'impact',
+                    'lucida_grande',
+                    'times_new_roman',
+                    'verdana',
+                  ],
+                },
+                'removeFormat',
+              ],
+              ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+
+              ['undo', 'redo'],
+              ['viewsource'],
+            ]"
+            :fonts="{
+              arial: 'Arial',
+              arial_black: 'Arial Black',
+              comic_sans: 'Comic Sans MS',
+              courier_new: 'Courier New',
+              impact: 'Impact',
+              lucida_grande: 'Lucida Grande',
+              times_new_roman: 'Times New Roman',
+              verdana: 'Verdana',
+            }"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -136,24 +218,31 @@ export default {
       showCreateGroupDialog.value = false;
     };
 
+    const questionTitle = ref("");
+    const selectedGroup = ref("");
+    const questionDescription = ref("");
+
     const addQuestion = () => {
-      if (questionName.value.trim() === "" || questionGroup.value === "") {
+      if (
+        questionTitle.value.trim() === "" ||
+        questionDescription.value.trim() === "" ||
+        selectedGroup.value.trim() === ""
+      ) {
         return;
       }
 
-      const targetGroup = groups.value.find(
-        (group) => group.label === questionGroup.value
-      );
-      if (targetGroup) {
-        targetGroup.children.push({
-          label: questionName.value,
-          description: "",
-        });
-      }
+      const group = groups.value.find((g) => g.label === selectedGroup.value);
 
-      questionName.value = "";
-      questionGroup.value = "";
-      showCreateQuestionDialog.value = false;
+      if (group) {
+        group.children.push({
+          label: questionTitle.value,
+          description: questionDescription.value,
+        });
+        questionTitle.value = "";
+        questionDescription.value = "";
+        selectedGroup.value = "";
+        showCreateQuestionDialog.value = false;
+      }
     };
 
     const flattenedNodes = computed(() => {
@@ -174,17 +263,18 @@ export default {
 
     return {
       splitterModel,
+      questionTitle,
+      selectedGroup,
       selected,
       groups,
       showCreateGroupDialog,
       showCreateQuestionDialog,
       groupName,
-      questionName,
-      questionGroup,
       addGroup,
       addQuestion,
       flattenedNodes,
       groupOptions,
+      questionDescription,
     };
   },
 };

@@ -22,6 +22,18 @@
             v-model:selected="selected"
             default-expand-all
           />
+          <q-btn
+            label="Edit Group"
+            color="warning"
+            @click="showEditGroupDialog = true"
+            class="q-mb-md"
+          />
+          <q-btn
+            label="Edit Question"
+            color="warning"
+            @click="showEditQuestionDialog = true"
+            class="q-mb-md"
+          />
         </div>
       </template>
 
@@ -43,6 +55,60 @@
         </q-tab-panels>
       </template>
     </q-splitter>
+
+    <q-dialog v-model="showEditGroupDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Edit Group Name</div>
+        </q-card-section>
+        <q-card-section>
+          <q-select
+            filled
+            v-model="selectedGroupToEdit"
+            :options="groupOptions"
+            label="Select a group"
+          />
+          <q-input filled v-model="newGroupName" label="New Group Name" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Save" color="primary" @click="editGroup" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showEditQuestionDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Edit Question</div>
+        </q-card-section>
+        <q-card-section>
+          <q-select
+            filled
+            v-model="selectedQuestionToEdit"
+            :options="questionOptions"
+            label="Select a question"
+          />
+          <q-input
+            filled
+            v-model="newQuestionTitle"
+            label="New Question Title"
+          />
+          <q-editor
+            filled
+            v-model="newQuestionDescription"
+            label="New Question Description"
+            :dense="$q.screen.lt.md"
+            :toolbar="toolbarOptions"
+            :fonts="fontOptions"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Save" color="primary" @click="editQuestion" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <q-dialog v-model="showCreateGroupDialog" persistent>
       <q-card>
@@ -202,6 +268,74 @@ export default {
     const groupName = ref("");
     const questionName = ref("");
     const questionGroup = ref("");
+    const showEditGroupDialog = ref(false);
+    const selectedGroupToEdit = ref("");
+    const newGroupName = ref("");
+    const showEditQuestionDialog = ref(false);
+    const selectedQuestionToEdit = ref("");
+    const newQuestionTitle = ref("");
+    const newQuestionDescription = ref("");
+    const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
+    const fontOptions = ref(/* ... */); // font options from previous q-editor
+
+    const editQuestion = () => {
+      if (
+        selectedQuestionToEdit.value.trim() === "" ||
+        newQuestionTitle.value.trim() === "" ||
+        newQuestionDescription.value.trim() === ""
+      ) {
+        return;
+      }
+
+      const group = groups.value.find((g) =>
+        g.children.find((c) => c.label === selectedQuestionToEdit.value)
+      );
+
+      if (group) {
+        const question = group.children.find(
+          (c) => c.label === selectedQuestionToEdit.value
+        );
+
+        if (question) {
+          question.label = newQuestionTitle.value;
+          question.description = newQuestionDescription.value;
+          newQuestionTitle.value = "";
+          newQuestionDescription.value = "";
+          selectedQuestionToEdit.value = "";
+          showEditQuestionDialog.value = false;
+        }
+      }
+    };
+
+    const questionOptions = computed(() => {
+      const options = [];
+      groups.value.forEach((group) => {
+        group.children.forEach((child) => {
+          options.push(child.label);
+        });
+      });
+      return options;
+    });
+
+    const editGroup = () => {
+      if (
+        selectedGroupToEdit.value.trim() === "" ||
+        newGroupName.value.trim() === ""
+      ) {
+        return;
+      }
+
+      const group = groups.value.find(
+        (g) => g.label === selectedGroupToEdit.value
+      );
+
+      if (group) {
+        group.label = newGroupName.value;
+        newGroupName.value = "";
+        selectedGroupToEdit.value = "";
+        showEditGroupDialog.value = false;
+      }
+    };
 
     const addGroup = () => {
       if (groupName.value.trim() === "") {
@@ -275,6 +409,18 @@ export default {
       flattenedNodes,
       groupOptions,
       questionDescription,
+      showEditGroupDialog,
+      selectedGroupToEdit,
+      newGroupName,
+      editGroup,
+      showEditQuestionDialog,
+      selectedQuestionToEdit,
+      newQuestionTitle,
+      newQuestionDescription,
+      toolbarOptions,
+      fontOptions,
+      editQuestion,
+      questionOptions,
     };
   },
 };

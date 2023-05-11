@@ -4,13 +4,19 @@
       <template v-slot:before>
         <div class="q-pa-md">
           <q-btn
-            label="Create"
+            label="Create Group"
             color="primary"
-            @click="showCreateDialog = true"
+            @click="showCreateGroupDialog = true"
+            class="q-mb-md"
+          />
+          <q-btn
+            label="Create Question"
+            color="secondary"
+            @click="showCreateQuestionDialog = true"
             class="q-mb-md"
           />
           <q-tree
-            :nodes="simple"
+            :nodes="groups"
             node-key="label"
             selected-color="primary"
             v-model:selected="selected"
@@ -38,17 +44,38 @@
       </template>
     </q-splitter>
 
-    <q-dialog v-model="showCreateDialog" persistent>
+    <q-dialog v-model="showCreateGroupDialog" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <div class="text-h6">Create a new panel</div>
+          <div class="text-h6">Create a new group</div>
         </q-card-section>
         <q-card-section>
-          <q-input filled v-model="newPanelName" label="Panel Name" />
+          <q-input filled v-model="groupName" label="Group Name" />
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Create" color="primary" @click="addPanel" />
+          <q-btn flat label="Create" color="primary" @click="addGroup" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showCreateQuestionDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Create a new question</div>
+        </q-card-section>
+        <q-card-section>
+          <q-input filled v-model="questionName" label="Question Name" />
+          <q-select
+            filled
+            v-model="questionGroup"
+            :options="groupOptions"
+            label="Group"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Create" color="primary" @click="addQuestion" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -63,45 +90,70 @@ export default {
     const splitterModel = ref(50);
     const selected = ref("Food");
 
-    const simple = ref([
+    const groups = ref([
       {
-        label: "Relax Hotel",
+        label: "Group 1",
         children: [
           {
-            label: "Food",
-            description:
-              "Lorem ipsum dolor sit, amet consectetur adipisicing elit...",
+            label: "Question 1",
+            description: "Description for Question 1",
           },
           {
-            label: "Room service",
-            description:
-              "Lorem ipsum dolor sit, amet consectetur adipisicing elit...",
+            label: "Question 2",
+            description: "Description for Question 2",
           },
+        ],
+      },
+      {
+        label: "Group 2",
+        children: [
           {
-            label: "Room view",
-            description:
-              "Lorem ipsum dolor sit, amet consectetur adipisicing elit...",
+            label: "Question 3",
+            description: "Description for Question 3",
           },
         ],
       },
     ]);
 
-    const showCreateDialog = ref(false);
-    const newPanelName = ref("");
+    const showCreateGroupDialog = ref(false);
+    const showCreateQuestionDialog = ref(false);
+    const groupName = ref("");
+    const questionName = ref("");
+    const questionGroup = ref("");
 
-    const addPanel = () => {
-      if (newPanelName.value.trim() === "") {
+    const addGroup = () => {
+      if (groupName.value.trim() === "") {
         return;
       }
 
-      simple.value.push({
-        label: newPanelName.value,
+      groups.value.push({
+        label: groupName.value,
         children: [],
       });
-      selected.value;
-      selected.value = newPanelName.value;
-      newPanelName.value = "";
-      showCreateDialog.value = false;
+
+      selected.value = groupName.value;
+      groupName.value = "";
+      showCreateGroupDialog.value = false;
+    };
+
+    const addQuestion = () => {
+      if (questionName.value.trim() === "" || questionGroup.value === "") {
+        return;
+      }
+
+      const targetGroup = groups.value.find(
+        (group) => group.label === questionGroup.value
+      );
+      if (targetGroup) {
+        targetGroup.children.push({
+          label: questionName.value,
+          description: "",
+        });
+      }
+
+      questionName.value = "";
+      questionGroup.value = "";
+      showCreateQuestionDialog.value = false;
     };
 
     const flattenedNodes = computed(() => {
@@ -112,18 +164,27 @@ export default {
         }
         nodes.push(node);
       };
-      simple.value.forEach(traverse);
+      groups.value.forEach(traverse);
       return nodes;
+    });
+
+    const groupOptions = computed(() => {
+      return groups.value.map((group) => group.label);
     });
 
     return {
       splitterModel,
       selected,
-      simple,
-      showCreateDialog,
-      newPanelName,
-      addPanel,
+      groups,
+      showCreateGroupDialog,
+      showCreateQuestionDialog,
+      groupName,
+      questionName,
+      questionGroup,
+      addGroup,
+      addQuestion,
       flattenedNodes,
+      groupOptions,
     };
   },
 };

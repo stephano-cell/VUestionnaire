@@ -9,6 +9,7 @@
             @click="showCreateGroupDialog = true"
             class="q-mb-md"
           />
+
           <q-btn
             label="Create Question"
             color="secondary"
@@ -32,6 +33,18 @@
             label="Edit Question"
             color="warning"
             @click="showEditQuestionDialog = true"
+            class="q-mb-md"
+          />
+          <q-btn
+            label="Delete Group"
+            color="orange"
+            @click="showDeleteGroupDialog = true"
+            class="q-mb-md"
+          />
+          <q-btn
+            label="Delete Question"
+            color="orange"
+            @click="showDeleteQuestionDialog = true"
             class="q-mb-md"
           />
         </div>
@@ -227,6 +240,45 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="showDeleteGroupDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Delete Group</div>
+        </q-card-section>
+        <q-card-section>
+          <q-select
+            filled
+            v-model="selectedGroupToDelete"
+            :options="groupOptions"
+            label="Select a group"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Delete" color="negative" @click="deleteGroup" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <!-- ... -->
+    <q-dialog v-model="showDeleteQuestionDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <div class="text-h6">Delete Question</div>
+        </q-card-section>
+        <q-card-section>
+          <q-select
+            filled
+            v-model="selectedQuestionToDelete"
+            :options="questionOptions"
+            label="Select a question"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Delete" color="negative" @click="deleteQuestion" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -277,7 +329,36 @@ export default {
     const newQuestionDescription = ref("");
     const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
     const fontOptions = ref(/* ... */); // font options from previous q-editor
+    const showDeleteGroupDialog = ref(false);
+    const selectedGroupToDelete = ref("");
+    const showDeleteQuestionDialog = ref(false);
+    const selectedQuestionToDelete = ref("");
 
+    const deleteGroup = () => {
+      const index = groups.value.findIndex(
+        (g) => g.label === selectedGroupToDelete.value
+      );
+
+      if (index !== -1) {
+        groups.value.splice(index, 1);
+        selectedGroupToDelete.value = "";
+        showDeleteGroupDialog.value = false;
+      }
+    };
+
+    const deleteQuestion = () => {
+      groups.value.forEach((group) => {
+        const index = group.children.findIndex(
+          (c) => c.label === selectedQuestionToDelete.value
+        );
+
+        if (index !== -1) {
+          group.children.splice(index, 1);
+          selectedQuestionToDelete.value = "";
+          showDeleteQuestionDialog.value = false;
+        }
+      });
+    };
     const editQuestion = () => {
       if (
         selectedQuestionToEdit.value.trim() === "" ||
@@ -334,6 +415,9 @@ export default {
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
+
+        // Sort the groups alphabetically.
+        groups.value.sort((a, b) => a.label.localeCompare(b.label));
       }
     };
 
@@ -346,6 +430,9 @@ export default {
         label: groupName.value,
         children: [],
       });
+
+      // Sort the groups alphabetically.
+      groups.value.sort((a, b) => a.label.localeCompare(b.label));
 
       selected.value = groupName.value;
       groupName.value = "";
@@ -372,6 +459,7 @@ export default {
           label: questionTitle.value,
           description: questionDescription.value,
         });
+
         questionTitle.value = "";
         questionDescription.value = "";
         selectedGroup.value = "";
@@ -421,6 +509,12 @@ export default {
       fontOptions,
       editQuestion,
       questionOptions,
+      showDeleteGroupDialog,
+      selectedGroupToDelete,
+      showDeleteQuestionDialog,
+      selectedQuestionToDelete,
+      deleteGroup,
+      deleteQuestion,
     };
   },
 };

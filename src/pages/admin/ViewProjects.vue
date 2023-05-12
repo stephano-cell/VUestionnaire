@@ -2,11 +2,34 @@
   <div>
     <q-input
       filled
-      v-model="fullName"
-      label="Full Name *"
-      hint="Name and surname"
+      v-model="projectName"
+      label="Project Name"
+      hint="Name of Project"
       lazy-rules
       :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      class="q-ma-md q-mb-ml"
+    />
+    <q-input
+      filled
+      v-model="company"
+      label="Company"
+      hint="Name of company"
+      lazy-rules
+      :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      class="q-ma-md q-mb-ml"
+    />
+    <q-select
+      filled
+      v-model="client"
+      label="Assign Client"
+      :options="sortedClients"
+      multiple
+      emit-value
+      map-options
+      option-value="name"
+      option-label="name"
+      filter
+      filter-placeholder="Search projects"
       class="q-ma-md q-mb-xl"
     />
 
@@ -280,8 +303,7 @@ export default {
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
     const groupName = ref("");
-    const questionName = ref("");
-    const questionGroup = ref("");
+
     const showEditGroupDialog = ref(false);
     const selectedGroupToEdit = ref("");
     const newGroupName = ref("");
@@ -291,6 +313,18 @@ export default {
     const newQuestionDescription = ref("");
     const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
     const fontOptions = ref(/* ... */); // font options from previous q-editor
+    const client = ref([]);
+
+    const clients = ref([
+      { name: "astesttest1" },
+      { name: "stephanos" },
+      { name: "aristos" },
+      { name: "spiderman" },
+    ]);
+
+    const sortedClients = computed(() => {
+      return [...clients.value].sort((a, b) => a.name.localeCompare(b.name));
+    });
 
     const editQuestion = () => {
       if (
@@ -465,6 +499,9 @@ export default {
       questionOptions,
       ticked,
       editSelected,
+      client,
+      clients,
+      sortedClients,
       // goToNextQuestion,
     };
   },

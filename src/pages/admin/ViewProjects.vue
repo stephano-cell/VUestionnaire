@@ -19,21 +19,21 @@
       class="q-ma-md q-mb-ml"
     />
 
-    <q-splitter v-model="splitterModel" style="height: 800px">
+    <q-splitter v-model="splitterModel" style="height: 500px">
       <template v-slot:before>
         <div class="q-pa-md">
           <q-btn
             label="Create Group"
             color="primary"
             @click="showCreateGroupDialog = true"
-            class="q-mb-md"
+            class="q-ma-md"
           />
 
           <q-btn
             label="Create Question"
             color="secondary"
             @click="showCreateQuestionDialog = true"
-            class="q-mb-md"
+            class="q-ma-md"
           />
           <q-tree
             :nodes="groups"
@@ -237,6 +237,8 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-btn label="Submit" type="submit" color="primary" class="q-ma-md" />
   </div>
 </template>
 

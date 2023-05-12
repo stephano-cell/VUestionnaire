@@ -18,20 +18,6 @@
       :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       class="q-ma-md q-mb-ml"
     />
-    <q-select
-      filled
-      v-model="client"
-      label="Assign Client"
-      :options="sortedClients"
-      multiple
-      emit-value
-      map-options
-      option-value="name"
-      option-label="name"
-      filter
-      filter-placeholder="Search projects"
-      class="q-ma-md q-mb-xl"
-    />
 
     <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
@@ -313,18 +299,6 @@ export default {
     const newQuestionDescription = ref("");
     const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
     const fontOptions = ref(/* ... */); // font options from previous q-editor
-    const client = ref([]);
-
-    const clients = ref([
-      { name: "astesttest1" },
-      { name: "stephanos" },
-      { name: "aristos" },
-      { name: "spiderman" },
-    ]);
-
-    const sortedClients = computed(() => {
-      return [...clients.value].sort((a, b) => a.name.localeCompare(b.name));
-    });
 
     const editQuestion = () => {
       if (
@@ -499,9 +473,7 @@ export default {
       questionOptions,
       ticked,
       editSelected,
-      client,
-      clients,
-      sortedClients,
+
       // goToNextQuestion,
     };
   },

@@ -66,7 +66,7 @@
           filled
           v-model="project"
           label="Project"
-          :options="projects"
+          :options="sortedProjects"
           multiple
           emit-value
           map-options
@@ -92,8 +92,8 @@
 </template>
 
 <script>
+import { computed, ref } from "vue";
 import useQuasar from "quasar/src/composables/use-quasar.js";
-import { ref } from "vue";
 
 export default {
   props: {
@@ -122,6 +122,9 @@ export default {
       { name: "aristos" },
       { name: "spiderman" },
     ];
+    const sortedProjects = computed(() => {
+      return [...projects].sort((a, b) => a.name.localeCompare(b.name));
+    });
 
     const roles = [
       { label: "admin", value: "admin" },
@@ -137,8 +140,8 @@ export default {
       role,
       roles,
       allowLogin,
-      project, // add project ref
-      projects, // add projects options
+      project,
+      sortedProjects, // use sortedProjects instead of projects
 
       onSubmit() {
         $q.notify({
@@ -155,7 +158,7 @@ export default {
         email.value = null;
         companyName.value = null;
         password.value = null;
-        project.value = []; // add project reset
+        project.value = [];
       },
     };
   },

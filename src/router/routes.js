@@ -13,6 +13,11 @@ const routes = [
         component: () => import("pages/admin/ListProjects.vue"),
       },
       {
+        path: "/admin/review_project",
+        component: () => import("pages/admin/ReviewProject.vue"),
+      },
+
+      {
         path: "/admin/new",
         component: () => import("pages/admin/ViewUser.vue"),
         props: () => ({
@@ -26,6 +31,7 @@ const routes = [
           mode: "new",
         }),
       },
+
       {
         path: "/admin/edit",
         component: () => import("pages/admin/ViewUser.vue"),

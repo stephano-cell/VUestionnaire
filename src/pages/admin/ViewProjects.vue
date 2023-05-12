@@ -1,6 +1,16 @@
 <template>
   <div>
-    <q-splitter v-model="splitterModel" style="height: 400px">
+    <q-page class="q-pa-md">
+      <q-input
+        filled
+        v-model="fullName"
+        label="Full Name *"
+        hint="Name and surname"
+        lazy-rules
+        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      />
+    </q-page>
+    <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
         <div class="q-pa-md">
           <q-btn
@@ -136,30 +146,14 @@
             label="Question Description"
             :dense="$q.screen.lt.md"
             :toolbar="[
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-              ],
-              [
-                'bold',
-                'italic',
-                'strike',
-                'underline',
-                'subscript',
-                'superscript',
-              ],
-              ['token', 'hr', 'link', 'custom_btn'],
-              ['print', 'fullscreen'],
+              ['bold', 'italic', 'strike', 'underline'],
+
               [
                 {
                   label: $q.lang.editor.formatting,
                   icon: $q.iconSet.editor.formatting,
                   list: 'no-icons',
-                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code'],
+                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
                 },
                 {
                   label: $q.lang.editor.fontSize,
@@ -196,10 +190,20 @@
                 },
                 'removeFormat',
               ],
-              ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  list: 'only-icons',
+                  options: ['left', 'center', 'right', 'justify'],
+                },
+                'unordered',
+                'ordered',
+              ],
 
               ['undo', 'redo'],
-              ['viewsource'],
+              ['fullscreen', 'viewsource'],
             ]"
             :fonts="{
               arial: 'Arial',

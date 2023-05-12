@@ -61,21 +61,6 @@ const columns = [
     field: "projectName",
     sortable: true,
   },
-  {
-    name: "account_manager",
-    align: "center",
-    label: "Account Manager",
-    field: "account_manager",
-    sortable: true,
-  },
-
-  {
-    name: "comments",
-    align: "center",
-    label: "comments",
-    field: "comments",
-    sortable: true,
-  },
 
   { name: "company", label: "Company", field: "company", sortable: true },
   {
@@ -141,8 +126,6 @@ const rowsData = [
     projectName: "Tvod SVOD",
 
     company: "Plex",
-    account_manager: "Aris",
-    comments: "This project is for this company which is bla bla previously sf",
     assigned_clients: ["satephanos", "asdfasfe"],
 
     last_client_activity: "2023-03-01",
@@ -156,8 +139,6 @@ const rowsData = [
     projectName: "Tvod EST SVOD",
 
     company: "Spidernet",
-    account_manager: "Naruto",
-    comments: "Testing for fund",
     assigned_clients: ["satephanos", "hello"],
 
     last_client_activity: "2022-03-01",

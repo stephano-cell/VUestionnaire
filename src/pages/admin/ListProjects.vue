@@ -17,6 +17,7 @@
         @focusin="activateNavigation"
         @focusout="deactivateNavigation"
         @keydown="onKey"
+        @row-click="onRowClick"
       >
         <template v-slot:top-right>
           <q-input
@@ -165,6 +166,11 @@ export default {
     const pagination = ref({});
     const selected = ref([]);
 
+    const onRowClick = (evt, row) => {
+      console.log("Row clicked: ", row);
+      // Do something when a row is clicked
+    };
+
     return {
       tableRef,
       navigationActive,
@@ -173,6 +179,7 @@ export default {
       pagination,
       columns,
       rows,
+      onRowClick,
 
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null

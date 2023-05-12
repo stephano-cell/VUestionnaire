@@ -1,20 +1,20 @@
 <template>
   <div>
-    <q-splitter v-model="splitterModel" style="height: 400px">
+    <q-splitter v-model="splitterModel" style="height: 600px">
       <template v-slot:before>
         <div class="q-pa-md">
           <q-btn
             label="Create Group"
             color="primary"
             @click="showCreateGroupDialog = true"
-            class="q-mb-md"
+            class="q-ma-md q-mb-ml"
           />
 
           <q-btn
             label="Create Question"
             color="secondary"
             @click="showCreateQuestionDialog = true"
-            class="q-mb-md"
+            class="q-ma-md q-mb-ml"
           />
           <q-tree
             :nodes="groups"
@@ -23,25 +23,6 @@
             v-model:selected="selected"
             default-expand-all
             @dblclick="editSelected"
-          />
-          <q-btn
-            label="Delete Group"
-            color="orange"
-            @click="showDeleteGroupDialog = true"
-            class="q-mb-md"
-          />
-          <q-btn
-            label="Delete Question"
-            color="orange"
-            @click="showDeleteQuestionDialog = true"
-            class="q-mb-md"
-          />
-          <br />
-          <q-btn
-            label="Save"
-            color="primary"
-            @click="Save = true"
-            class="q-mb-md"
           />
         </div>
       </template>
@@ -64,6 +45,25 @@
         </q-tab-panels>
       </template>
     </q-splitter>
+    <q-btn
+      label="Delete Group"
+      color="orange"
+      @click="showDeleteGroupDialog = true"
+      class="q-ma-md q-mb-ml"
+    />
+    <q-btn
+      label="Delete Question"
+      color="orange"
+      @click="showDeleteQuestionDialog = true"
+      class="q-ma-md q-mb-ml"
+    />
+    <br />
+    <q-btn
+      label="Save"
+      color="primary"
+      @click="Save = true"
+      class="q-ma-md q-mb-ml"
+    />
 
     <q-dialog v-model="showEditGroupDialog" persistent>
       <q-card>

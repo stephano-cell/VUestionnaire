@@ -34,6 +34,14 @@ const routes = [
           id: route.params.id,
         }),
       },
+      {
+        path: "/admin/edit_project",
+        component: () => import("pages/admin/ViewProjects.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
 
       {
         path: "/admin/groups",

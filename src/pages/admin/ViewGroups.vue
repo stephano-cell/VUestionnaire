@@ -36,6 +36,13 @@
             @click="showDeleteQuestionDialog = true"
             class="q-mb-md"
           />
+          <br />
+          <q-btn
+            label="Save"
+            color="primary"
+            @click="Save = true"
+            class="q-mb-md"
+          />
         </div>
       </template>
 

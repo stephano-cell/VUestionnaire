@@ -345,7 +345,7 @@ import { ref, computed } from "vue";
 
 export default {
   setup() {
-    const splitterModel = ref(50);
+    const splitterModel = ref(20);
     const selected = ref("Food");
     const editSelected = () => {
       const group = groups.value.find((g) => g.label === selected.value);

@@ -1,15 +1,15 @@
 <template>
   <div>
-    <q-page class="q-pa-md">
-      <q-input
-        filled
-        v-model="fullName"
-        label="Full Name *"
-        hint="Name and surname"
-        lazy-rules
-        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
-      />
-    </q-page>
+    <q-input
+      filled
+      v-model="fullName"
+      label="Full Name *"
+      hint="Name and surname"
+      lazy-rules
+      :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      class="q-ma-md q-mb-xl"
+    />
+
     <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
         <div class="q-pa-md">
@@ -53,6 +53,11 @@
           >
             <div class="text-h4 q-mb-md">{{ node.label }}</div>
             <p v-html="node.description"></p>
+            <!-- <q-btn
+              label="Next Question"
+              color="secondary"
+              @click="goToNextQuestion(node)"
+            /> -->
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -231,7 +236,7 @@ import { ref, computed } from "vue";
 
 export default {
   setup() {
-    const splitterModel = ref(50);
+    const splitterModel = ref(20);
     const selected = ref("Food");
     const ticked = ref([]);
     const editSelected = () => {
@@ -401,6 +406,20 @@ export default {
         showCreateQuestionDialog.value = false;
       }
     };
+    // const goToNextQuestion = (currentQuestion) => {
+    //   // Filter out the groups, leaving only questions
+    //   const questionsOnly = flattenedNodes.value.filter(
+    //     (node) => node.description
+    //   );
+
+    //   const currentIndex = questionsOnly.findIndex(
+    //     (node) => node.label === currentQuestion.label
+    //   );
+
+    //   if (currentIndex !== -1 && currentIndex < questionsOnly.length - 1) {
+    //     selected.value = questionsOnly[currentIndex + 1].label;
+    //   }
+    // };
 
     const flattenedNodes = computed(() => {
       const nodes = [];
@@ -446,6 +465,7 @@ export default {
       questionOptions,
       ticked,
       editSelected,
+      // goToNextQuestion,
     };
   },
 };

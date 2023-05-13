@@ -1,10 +1,19 @@
 <template>
   <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
-      style="width: 200px; height: 200px"
-    />
+    <q-tabs v-model="selectedTab">
+      <q-tab name="users"
+        ><q-icon color="orange" name="face" size="20em" />
+        Clients
+      </q-tab>
+      <q-tab name="projects"
+        ><q-icon color="green" name="edit_document" size="20em" />
+        Projects
+      </q-tab>
+      <q-tab name="questions"
+        ><q-icon color="blue" name="quiz" size="20em" />
+        Questions
+      </q-tab>
+    </q-tabs>
   </q-page>
 </template>
 
@@ -15,3 +24,9 @@ export default defineComponent({
   name: "IndexPage",
 });
 </script>
+
+<style>
+.mainMenu {
+  font-size: 32 pt !important;
+}
+</style>

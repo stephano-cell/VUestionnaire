@@ -3,11 +3,6 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>VUestionnaire</q-toolbar-title>
-        <q-tabs v-model="selectedTab">
-          <q-tab name="users" label="view users" />
-          <q-tab name="create_project" label="new project" />
-          <q-tab name="view_projects" label="view projects" />
-        </q-tabs>
       </q-toolbar>
     </q-header>
     <q-page-container>

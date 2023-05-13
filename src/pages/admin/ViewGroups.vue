@@ -105,8 +105,8 @@
           />
           <q-editor
             filled
-            v-model="questionDescription"
-            label="Question Description"
+            v-model="newQuestionDescription"
+            label="New Question Description"
             :dense="$q.screen.lt.md"
             :toolbar="[
               ['bold', 'italic', 'strike', 'underline'],

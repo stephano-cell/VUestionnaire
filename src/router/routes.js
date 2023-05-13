@@ -5,52 +5,49 @@ const routes = [
     children: [
       { path: "", component: () => import("pages/IndexPage.vue") },
       {
-        path: "/admin",
+        path: "/admin/user/list",
         component: () => import("pages/admin/ListUsers.vue"),
       },
       {
-        path: "/admin/projects",
+        path: "/admin/user/new",
+        component: () => import("pages/admin/ViewUser.vue"),
+        props: () => ({
+          mode: "new",
+        }),
+      },
+      {
+        path: "/admin/user/edit",
+        component: () => import("pages/admin/ViewUser.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
+      {
+        path: "/admin/project/list",
         component: () => import("pages/admin/ListProjects.vue"),
       },
       {
-        path: "/admin/review_project",
+        path: "/admin/project/new",
+        component: () => import("pages/admin/ViewProjects.vue"),
+        props: () => ({
+          mode: "new",
+        }),
+      },
+      {
+        path: "/admin/project/edit",
+        component: () => import("pages/admin/ViewProjects.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
+      {
+        path: "/admin/project/review",
         component: () => import("pages/admin/ReviewProject.vue"),
       },
-
       {
-        path: "/admin/new",
-        component: () => import("pages/admin/ViewUser.vue"),
-        props: () => ({
-          mode: "new",
-        }),
-      },
-      {
-        path: "/admin/new_project",
-        component: () => import("pages/admin/ViewProjects.vue"),
-        props: () => ({
-          mode: "new",
-        }),
-      },
-
-      {
-        path: "/admin/edit",
-        component: () => import("pages/admin/ViewUser.vue"),
-        props: (route) => ({
-          mode: "edit",
-          id: route.params.id,
-        }),
-      },
-      {
-        path: "/admin/edit_project",
-        component: () => import("pages/admin/ViewProjects.vue"),
-        props: (route) => ({
-          mode: "edit",
-          id: route.params.id,
-        }),
-      },
-
-      {
-        path: "/admin/groups",
+        path: "/admin/question/manage",
         component: () => import("pages/admin/ViewGroups.vue"),
       },
     ],

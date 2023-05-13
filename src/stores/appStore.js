@@ -12,9 +12,14 @@ export const useAppStore = defineStore("appStore", {
     },
   },
   actions: {
+    logout() {
+      console.log("Logout");
+      this.auth = null;
+    },
     authenticate(username, pass) {
       if (username == "admin" && pass == "pass") {
         this.auth = "admin";
+        console.log("Login as: " + this.auth);
         return true;
       }
       return false;

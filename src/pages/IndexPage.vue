@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <q-tabs v-model="selectedTab">
+    <q-tabs>
       <q-tab name="users"
         ><q-icon color="orange" name="face" size="20em" />
         Clients

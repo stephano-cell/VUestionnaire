@@ -12,15 +12,11 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "MainLayout",
   components: {},
-  setup() {
-    return {
-      selectedTab: ref("users"),
-    };
-  },
+  setup() {},
 });
 </script>

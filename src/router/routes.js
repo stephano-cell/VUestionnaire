@@ -52,11 +52,13 @@ const routes = [
       },
     ],
   },
-
   {
     path: "/login",
     name: "login",
     component: () => import("pages/LoginPage.vue"),
+    props: (route) => ({
+      redirect: route.query.redirect,
+    }),
   },
   // Always leave this as last one,
   // but you can also remove it

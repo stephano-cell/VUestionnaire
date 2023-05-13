@@ -1,3 +1,4 @@
+import { useAppStore } from "../stores/appStore";
 import { route } from "quasar/wrappers";
 import {
   createRouter,
@@ -36,8 +37,9 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to, from, next) => {
-    const isAuthenticated = true;
-    if (to.name !== "login" && !isAuthenticated) next({ name: "login" });
+    const store = useAppStore();
+    if (to.name !== "login" && !store.authenticated)
+      next({ name: "login", query: { redirect: to.path } });
     else next();
   });
 

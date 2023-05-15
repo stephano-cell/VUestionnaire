@@ -1,9 +1,18 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
-        <q-toolbar-title>VUestionnaire</q-toolbar-title>
-        <q-space />
+      <q-toolbar style="display: flex">
+        <q-btn outline style="visibility: hidden">Logout</q-btn>
+        <q-toolbar-title style="flex-grow: 1; text-align: center"
+          >VUestionnaire</q-toolbar-title
+        >
+        <q-btn
+          outline
+          @click="back"
+          style="margin-right: 10px"
+          v-if="router.currentRoute.value.path !== '/'"
+          >back</q-btn
+        >
         <q-btn outline @click="logout">Logout</q-btn>
       </q-toolbar>
     </q-header>
@@ -29,7 +38,10 @@ export default defineComponent({
       store.logout();
       router.replace("/login");
     };
-    return { logout };
+    const back = () => {
+      router.back("/");
+    };
+    return { logout, router, back };
   },
 });
 </script>

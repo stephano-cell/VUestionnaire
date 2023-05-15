@@ -11,11 +11,21 @@
         Clients
       </q-tab>
       <q-tab name="projects"
-        ><q-icon color="green" name="edit_document" size="20em" />
+        ><q-icon
+          color="green"
+          name="edit_document"
+          size="20em"
+          @click="adminProjectsList"
+        />
         Projects
       </q-tab>
       <q-tab name="questions"
-        ><q-icon color="blue" name="quiz" size="20em" />
+        ><q-icon
+          color="blue"
+          name="quiz"
+          size="20em"
+          @click="adminGroupsList"
+        />
         Questions
       </q-tab>
     </q-tabs>
@@ -24,32 +34,27 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
-import { useAppStore } from "../stores/appStore";
 
 export default defineComponent({
   name: "IndexPage",
-  setup(props) {
-    const { redirect } = toRefs(props);
-    console.log("Redirection: " + redirect?.value);
-    const username = ref("admin");
-    const password = ref("pass");
+  setup() {
     const router = useRouter();
-    const store = useAppStore();
 
     const adminUserList = () => {
-      // Call authenticate with the value properties of username and password
-      if (store.authenticate(username.value, password.value)) {
-        console.log("Navigating");
-        router.replace("/admin/user/list");
-      }
+      router.push("/admin/user/list");
     };
 
+    const adminProjectsList = () => {
+      router.push("/admin/project/list");
+    };
+    const adminGroupsList = () => {
+      router.push("/admin/question/manage");
+    };
     return {
       adminUserList,
-      username,
-      password,
+      adminProjectsList,
+      adminGroupsList,
     };
   },
 });

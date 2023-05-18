@@ -10,7 +10,7 @@
           outline
           @click="back"
           style="margin-right: 10px"
-          v-if="router.currentRoute.value.path !== '/'"
+          v-if="router.currentRoute.value.path !== '/client/project/list'"
           >back</q-btn
         >
         <q-btn outline @click="logout">Logout</q-btn>
@@ -28,7 +28,7 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "../stores/appStore";
 
 export default defineComponent({
-  name: "MainLayout",
+  name: "ClientLayout",
   components: {},
   setup() {
     const store = useAppStore();
@@ -39,7 +39,7 @@ export default defineComponent({
       router.replace("/login");
     };
     const back = () => {
-      router.back("/client");
+      router.back("/client/project/list");
     };
     return { logout, router, back };
   },

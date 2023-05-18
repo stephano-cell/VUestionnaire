@@ -78,13 +78,6 @@ const columns = [
     field: "projectName",
     sortable: true,
   },
-  {
-    name: "comment",
-    style: "min-width: 200px; width: 200px",
-    align: "left",
-    label: "Comment (editable)",
-    field: "comment",
-  },
 
   { name: "company", label: "Company", field: "company", sortable: true },
   {
@@ -99,7 +92,13 @@ const columns = [
       }
     },
   },
-
+  {
+    name: "comment",
+    style: "min-width: 200px; width: 300px",
+    align: "left",
+    label: "Comment",
+    field: "comment",
+  },
   {
     name: "last_client_activity",
     align: "center",
@@ -148,8 +147,7 @@ const rowsData = [
   {
     id: 1,
     projectName: "Tvod SVOD",
-    comment:
-      "<p>It's cold but great and tastes different than normal ice cream, but it's great too!</p><p><strong>Have a taste!</strong></p>",
+    comment: "<p>Test</p>",
 
     company: "Plex",
     assigned_clients: ["satephanos", "asdfasfe"],

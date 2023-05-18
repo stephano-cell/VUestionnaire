@@ -18,6 +18,7 @@
         @focusout="deactivateNavigation"
         @keydown="onKey"
         @row-click="onRowClick"
+        wrap-cells
       >
         <template v-slot:top-right>
           <q-input
@@ -32,6 +33,21 @@
             </template>
           </q-input>
         </template>
+
+        <template v-slot:body-cell-comment="props">
+          <q-td :props="props">
+            <div v-html="props.row.comment"></div>
+            <q-popup-edit buttons v-model="props.row.comment" v-slot="scope">
+              <q-editor
+                v-model="scope.value"
+                min-height="5rem"
+                autofocus
+                @keyup.enter.stop
+              />
+            </q-popup-edit>
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-assigned_clients="props">
           <q-td :props="props">
             <q-select
@@ -40,6 +56,7 @@
             />
           </q-td>
         </template>
+
         <template v-slot:body-cell-edit="props">
           <q-td :props="props">
             <q-btn flat icon="edit" @click="editRow(props.row)" />
@@ -49,7 +66,6 @@
     </div>
   </q-page>
 </template>
-
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
 import { QSelect } from "quasar";
@@ -61,6 +77,13 @@ const columns = [
     label: "Project Name",
     field: "projectName",
     sortable: true,
+  },
+  {
+    name: "comment",
+    style: "min-width: 200px; width: 200px",
+    align: "left",
+    label: "Comment (editable)",
+    field: "comment",
   },
 
   { name: "company", label: "Company", field: "company", sortable: true },
@@ -125,6 +148,8 @@ const rowsData = [
   {
     id: 1,
     projectName: "Tvod SVOD",
+    comment:
+      "<p>It's cold but great and tastes different than normal ice cream, but it's great too!</p><p><strong>Have a taste!</strong></p>",
 
     company: "Plex",
     assigned_clients: ["satephanos", "asdfasfe"],
@@ -178,7 +203,7 @@ export default {
       selected,
       pagination,
       columns,
-      rows,
+      rows: ref(rows),
       onRowClick,
 
       tableClass: computed(() =>

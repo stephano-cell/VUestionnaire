@@ -1,5 +1,19 @@
 const routes = [
   {
+    path: "/client",
+    component: () => import("layouts/ClientLayout.vue"),
+    children: [
+      {
+        path: "/client/project/list",
+        component: () => import("pages/client/ListProjectsClient.vue"),
+      },
+      {
+        path: "/client/project/review",
+        component: () => import("pages/client/AnswerProjectsClient.vue"),
+      },
+    ],
+  },
+  {
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [

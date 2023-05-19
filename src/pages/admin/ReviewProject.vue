@@ -35,7 +35,6 @@
               <q-select
                 v-model="selectedClientResponse"
                 :options="clientResponses"
-                :display-value="clientResponses.values[0]"
                 label="Client"
                 style="width: 200px"
                 class="q-mb-md"
@@ -109,8 +108,12 @@ export default {
       },
     ]);
 
-    const selectedClientResponse = ref(null);
-    const selectedReviewerResponse = ref(null);
+    const selectedClientResponse = ref(
+      clientResponses.value[clientResponses.value.length - 1]
+    );
+    const selectedReviewerResponse = ref(
+      reviewerResponses.value[reviewerResponses.value.length - 1]
+    );
 
     const groups = ref([
       {

@@ -139,8 +139,6 @@ export default {
         ],
       },
     ]);
-    clientResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
-    reviewerResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
 
     const flattenedNodes = computed(() => {
       const nodes = [];
@@ -178,12 +176,12 @@ export default {
         label: reviewerNameDate,
       });
 
-      // Sort by date
-      clientResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
-      reviewerResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
-
       clientResponse.value = "";
       reviewerResponse.value = "";
+      selectedClientResponse.value =
+        clientResponses.value[clientResponses.value.length - 1];
+      selectedReviewerResponse.value =
+        reviewerResponses.value[reviewerResponses.value.length - 1];
     };
 
     const nextQuestion = () => {

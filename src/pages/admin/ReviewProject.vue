@@ -31,19 +31,26 @@
             <div class="q-mt-md">
               <div class="text-subtitle2 q-mb-xs">Client Answer</div>
               <q-editor v-model="clientResponse" class="q-mb-md" />
+
               <q-select
                 v-model="selectedClientResponse"
                 :options="clientResponses"
+                :display-value="clientResponses.values[0]"
+                label="Client"
                 style="width: 200px"
                 class="q-mb-md"
+                @update:model-value="updateClientResponse"
               />
+
               <div class="text-subtitle2 q-mb-xs">Reviewer Comment</div>
               <q-editor v-model="reviewerResponse" />
               <q-select
                 v-model="selectedReviewerResponse"
                 :options="reviewerResponses"
+                label="Reviewer"
                 style="width: 200px"
                 class="q-mb-md"
+                @update:model-value="updateReviewerResponse"
               />
             </div>
 
@@ -72,8 +79,36 @@ export default {
     const selected = ref(null);
     const clientResponse = ref("");
     const reviewerResponse = ref("");
-    const clientResponses = ref([]);
-    const reviewerResponses = ref([]);
+    const clientResponses = ref([
+      {
+        name: "Client 1",
+        date: "2023-05-18",
+        response: "Client Response 1",
+        label: "Client 1 - 2023-05-10",
+      },
+      {
+        name: "Client 2",
+        date: "2023-05-19",
+        response: "Client Response 2",
+        label: "Client 2 - 2023-05-08",
+      },
+    ]);
+
+    const reviewerResponses = ref([
+      {
+        name: "Reviewer 1",
+        date: "2023-05-20",
+        response: "Reviewer Comment 1",
+        label: "Reviewer 1 - 2023-05-10",
+      },
+      {
+        name: "Reviewer 2",
+        date: "2023-05-21",
+        response: "Reviewer Comment 2",
+        label: "Reviewer 2 - 2023-05-09",
+      },
+    ]);
+
     const selectedClientResponse = ref(null);
     const selectedReviewerResponse = ref(null);
 
@@ -101,6 +136,8 @@ export default {
         ],
       },
     ]);
+    clientResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
+    reviewerResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
 
     const flattenedNodes = computed(() => {
       const nodes = [];
@@ -117,13 +154,33 @@ export default {
     });
 
     const submit = () => {
-      clientResponses.value.push(clientResponse.value);
-      reviewerResponses.value.push(reviewerResponse.value);
+      const clientNameDate = `Client X - ${
+        new Date().toISOString().split("T")[0]
+      }`;
+      const reviewerNameDate = `Reviewer X - ${
+        new Date().toISOString().split("T")[0]
+      }`;
+
+      clientResponses.value.push({
+        name: "Client X",
+        date: new Date().toISOString().split("T")[0],
+        response: clientResponse.value,
+        label: clientNameDate,
+      });
+
+      reviewerResponses.value.push({
+        name: "Reviewer X",
+        date: new Date().toISOString().split("T")[0],
+        response: reviewerResponse.value,
+        label: reviewerNameDate,
+      });
+
+      // Sort by date
+      clientResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
+      reviewerResponses.value.sort((a, b) => (a.value > b.value ? 1 : -1));
 
       clientResponse.value = "";
       reviewerResponse.value = "";
-      selectedClientResponse.value = null;
-      selectedReviewerResponse.value = null;
     };
 
     const nextQuestion = () => {
@@ -134,6 +191,14 @@ export default {
       if (nextIndex < flattenedNodes.value.length) {
         selected.value = flattenedNodes.value[nextIndex].label;
       }
+    };
+
+    const updateClientResponse = (selectedObject) => {
+      clientResponse.value = selectedObject ? selectedObject.response : "";
+    };
+
+    const updateReviewerResponse = (selectedObject) => {
+      reviewerResponse.value = selectedObject ? selectedObject.response : "";
     };
 
     return {
@@ -149,6 +214,8 @@ export default {
       selectedReviewerResponse,
       submit,
       nextQuestion,
+      updateClientResponse,
+      updateReviewerResponse,
     };
   },
 };

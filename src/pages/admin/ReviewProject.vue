@@ -1,4 +1,5 @@
 <template>
+  <div></div>
   <div>
     <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
@@ -54,6 +55,21 @@
             </div>
 
             <div class="q-mt-md">
+              <div class="q-mb-md">
+                <q-checkbox
+                  v-model="isLocked"
+                  color="primary"
+                  label="Lock"
+                  class="text-bold q-mr-md"
+                />
+                <q-checkbox
+                  v-model="isComplete"
+                  color="secondary"
+                  label="Complete"
+                  class="text-bold"
+                />
+              </div>
+
               <q-btn
                 label="Submit"
                 color="primary"
@@ -78,6 +94,8 @@ export default {
     const selected = ref(null);
     const clientResponse = ref("");
     const reviewerResponse = ref("");
+    const isLocked = ref(false);
+    const isComplete = ref(false);
     const clientResponses = ref([
       {
         name: "Client 1",
@@ -217,6 +235,8 @@ export default {
       nextQuestion,
       updateClientResponse,
       updateReviewerResponse,
+      isLocked,
+      isComplete,
     };
   },
 };

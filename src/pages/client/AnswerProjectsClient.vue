@@ -176,9 +176,6 @@ export default {
       const clientNameDate = `Client X - ${
         new Date().toISOString().split("T")[0]
       }`;
-      const reviewerNameDate = `Reviewer X - ${
-        new Date().toISOString().split("T")[0]
-      }`;
 
       clientResponses.value.push({
         name: "Client X",

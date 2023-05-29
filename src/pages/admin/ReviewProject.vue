@@ -1,15 +1,43 @@
 <template>
   <div>
     <q-card bordered>
-      <q-card-section>
+      <q-card-section class="row items-center justify-between">
         <div class="text-h6">{{ projectName }}</div>
+        <q-btn-dropdown unelevated color="primary" label="Export">
+          <q-list>
+            <q-item
+              clickable
+              v-close-popup
+              @click="
+                exportOption = 'With Reviewer Comments';
+                exportData();
+              "
+            >
+              <q-item-section>
+                <q-item-label>With Reviewer Comments</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item
+              clickable
+              v-close-popup
+              @click="
+                exportOption = 'Without Reviewer Comments';
+                exportData();
+              "
+            >
+              <q-item-section>
+                <q-item-label>Without Reviewer Comments</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-card-section>
       <q-separator />
       <q-card-section class="row items-center q-col-gutter-md">
         <div class="col">Total Questions: {{ totalQuestions }}</div>
         <div class="col">Client to Answer: {{ clientToAnswer }}</div>
-        <div class="col">Questions for Reviewer: {{ adminToReview }}</div>
-        <div class="col">{{ status }}% Completed</div>
+        <div class="col">Admin to Review: {{ adminToReview }}</div>
+        <div class="col">{{ progress }}% Completed</div>
       </q-card-section>
     </q-card>
   </div>
@@ -106,7 +134,6 @@ export default {
     const splitterModel = ref(20);
     const selected = ref(null);
     const clientResponse = ref("");
-
     const reviewerResponse = ref("");
     const isLocked = ref(false);
     const isComplete = ref(false);
@@ -222,7 +249,7 @@ export default {
       );
       const nextIndex = currentIndex + 1;
       if (nextIndex < flattenedNodes.value.length) {
-        selected.value = flattenedNodes.value[nextIndex].label;
+        selected.value = flattenedNodes.value[nextIndex];
       }
     };
 
@@ -243,7 +270,41 @@ export default {
     const totalQuestions = ref(300);
     const clientToAnswer = ref(150);
     const adminToReview = ref(50);
-    const status = ref(50); // You can calculate this based on your data
+    const progress = ref(10); // You can calculate this based on your data
+    const exportOption = ref("With Reviewer Comments");
+
+    const exportData = () => {
+      const data = flattenedNodes.value
+        .map(
+          (node) => `
+        <h1>${node.label}</h1>
+        <p>${node.description}</p>
+        <p>${
+          clientResponses.value.find((response) => response.name === node.label)
+            ?.response || "No answer"
+        }</p>
+        ${
+          exportOption.value === "With Reviewer Comments"
+            ? `
+          <div style="border: 1px solid black; padding: 10px; margin-top: 10px;">
+            <strong>Reviewer:</strong>
+            <p>${
+              reviewerResponses.value.find(
+                (response) => response.name === node.label
+              )?.response || "No comment"
+            }</p>
+          </div>
+        `
+            : ""
+        }
+      `
+        )
+        .join("");
+
+      const exportWindow = window.open("", "_blank");
+      exportWindow.document.write(data);
+      exportWindow.document.close();
+    };
 
     return {
       splitterModel,
@@ -266,7 +327,9 @@ export default {
       totalQuestions,
       clientToAnswer,
       adminToReview,
-      status,
+      progress,
+      exportOption,
+      exportData,
     };
   },
 };

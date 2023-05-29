@@ -278,7 +278,7 @@
               ],
 
               ['undo', 'redo'],
-              ['fullscreen', 'viewsource'],
+              ['fullscreen'],
             ]"
             :fonts="{
               arial: 'Arial',

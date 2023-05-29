@@ -56,7 +56,9 @@
               />
 
               <div class="text-subtitle2 q-mb-xs">Reviewer Comment</div>
-              <q-editor v-model="reviewerResponse" />
+              <br />
+              <div v-html="reviewerResponse"></div>
+
               <q-select
                 v-model="selectedReviewerResponse"
                 :options="reviewerResponses"

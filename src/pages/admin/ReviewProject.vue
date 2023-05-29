@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 export default {
   setup() {
@@ -101,13 +101,13 @@ export default {
         name: "Client 1",
         date: "2023-05-18",
         response: "Client Response 1",
-        label: "Client 1 - 2023-05-10",
+        label: "Client 1 - 2023-05-18",
       },
       {
         name: "Client 2",
         date: "2023-05-19",
         response: "Client Response 2",
-        label: "Client 2 - 2023-05-08",
+        label: "Client 2 - 2023-05-19",
       },
     ]);
 
@@ -116,13 +116,13 @@ export default {
         name: "Reviewer 1",
         date: "2023-05-20",
         response: "Reviewer Comment 1",
-        label: "Reviewer 1 - 2023-05-10",
+        label: "Reviewer 1 - 2023-05-20",
       },
       {
         name: "Reviewer 2",
         date: "2023-05-21",
         response: "Reviewer Comment 2",
-        label: "Reviewer 2 - 2023-05-09",
+        label: "Reviewer 2 - 2023-05-21",
       },
     ]);
 
@@ -219,6 +219,11 @@ export default {
     const updateReviewerResponse = (selectedObject) => {
       reviewerResponse.value = selectedObject ? selectedObject.response : "";
     };
+
+    onMounted(() => {
+      clientResponse.value = selectedClientResponse.value.response;
+      reviewerResponse.value = selectedReviewerResponse.value.response;
+    });
 
     return {
       splitterModel,

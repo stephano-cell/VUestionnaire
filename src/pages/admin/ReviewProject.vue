@@ -71,8 +71,10 @@
             <p v-html="node.description"></p>
 
             <div class="q-mt-md">
+              <br />
               <div class="text-subtitle2 q-mb-xs">Client Answer</div>
-              <q-editor v-model="clientResponse" class="q-mb-md" />
+              <br />
+              <div v-html="clientResponse" class="q-mb-md"></div>
 
               <q-select
                 v-model="selectedClientResponse"
@@ -82,7 +84,6 @@
                 class="q-mb-md"
                 @update:model-value="updateClientResponse"
               />
-
               <div class="text-subtitle2 q-mb-xs">Reviewer Comment</div>
               <q-editor v-model="reviewerResponse" />
               <q-select

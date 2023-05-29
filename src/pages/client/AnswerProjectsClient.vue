@@ -187,19 +187,10 @@ export default {
         label: clientNameDate,
       });
 
-      reviewerResponses.value.push({
-        name: "Reviewer X",
-        date: new Date().toISOString().split("T")[0],
-        response: reviewerResponse.value,
-        label: reviewerNameDate,
-      });
-
       clientResponse.value = "";
-      reviewerResponse.value = "";
+
       selectedClientResponse.value =
         clientResponses.value[clientResponses.value.length - 1];
-      selectedReviewerResponse.value =
-        reviewerResponses.value[reviewerResponses.value.length - 1];
     };
 
     const nextQuestion = () => {

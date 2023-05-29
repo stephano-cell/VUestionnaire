@@ -215,19 +215,9 @@ export default {
     });
 
     const submit = () => {
-      const clientNameDate = `Client X - ${
-        new Date().toISOString().split("T")[0]
-      }`;
       const reviewerNameDate = `Reviewer X - ${
         new Date().toISOString().split("T")[0]
       }`;
-
-      clientResponses.value.push({
-        name: "Client X",
-        date: new Date().toISOString().split("T")[0],
-        response: clientResponse.value,
-        label: clientNameDate,
-      });
 
       reviewerResponses.value.push({
         name: "Reviewer X",
@@ -236,10 +226,8 @@ export default {
         label: reviewerNameDate,
       });
 
-      clientResponse.value = "";
       reviewerResponse.value = "";
-      selectedClientResponse.value =
-        clientResponses.value[clientResponses.value.length - 1];
+
       selectedReviewerResponse.value =
         reviewerResponses.value[reviewerResponses.value.length - 1];
     };

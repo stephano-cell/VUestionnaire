@@ -1,5 +1,18 @@
 <template>
-  <div></div>
+  <div>
+    <q-card bordered>
+      <q-card-section>
+        <div class="text-h6">{{ projectName }}</div>
+      </q-card-section>
+      <q-separator />
+      <q-card-section class="row items-center q-col-gutter-md">
+        <div class="col">Total Questions: {{ totalQuestions }}</div>
+        <div class="col">Client to Answer: {{ clientToAnswer }}</div>
+        <div class="col">Questions for Reviewer: {{ adminToReview }}</div>
+        <div class="col">{{ status }}% Completed</div>
+      </q-card-section>
+    </q-card>
+  </div>
   <div>
     <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
@@ -93,6 +106,7 @@ export default {
     const splitterModel = ref(20);
     const selected = ref(null);
     const clientResponse = ref("");
+
     const reviewerResponse = ref("");
     const isLocked = ref(false);
     const isComplete = ref(false);
@@ -101,13 +115,13 @@ export default {
         name: "Client 1",
         date: "2023-05-18",
         response: "Client Response 1",
-        label: "Client 1 - 2023-05-18",
+        label: "Client 1 - 2023-05-10",
       },
       {
         name: "Client 2",
         date: "2023-05-19",
         response: "Client Response 2",
-        label: "Client 2 - 2023-05-19",
+        label: "Client 2 - 2023-05-08",
       },
     ]);
 
@@ -116,13 +130,13 @@ export default {
         name: "Reviewer 1",
         date: "2023-05-20",
         response: "Reviewer Comment 1",
-        label: "Reviewer 1 - 2023-05-20",
+        label: "Reviewer 1 - 2023-05-10",
       },
       {
         name: "Reviewer 2",
         date: "2023-05-21",
         response: "Reviewer Comment 2",
-        label: "Reviewer 2 - 2023-05-21",
+        label: "Reviewer 2 - 2023-05-09",
       },
     ]);
 
@@ -225,6 +239,12 @@ export default {
       reviewerResponse.value = selectedReviewerResponse.value.response;
     });
 
+    const projectName = ref("Test 1");
+    const totalQuestions = ref(300);
+    const clientToAnswer = ref(150);
+    const adminToReview = ref(50);
+    const status = ref(50); // You can calculate this based on your data
+
     return {
       splitterModel,
       selected,
@@ -242,6 +262,11 @@ export default {
       updateReviewerResponse,
       isLocked,
       isComplete,
+      projectName,
+      totalQuestions,
+      clientToAnswer,
+      adminToReview,
+      status,
     };
   },
 };

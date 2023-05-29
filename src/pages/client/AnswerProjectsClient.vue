@@ -1,5 +1,19 @@
 <template>
   <div>
+    <q-card bordered>
+      <q-card-section>
+        <div class="text-h6">{{ projectName }}</div>
+      </q-card-section>
+      <q-separator />
+      <q-card-section class="row items-center q-col-gutter-md">
+        <div class="col">Total Questions: {{ totalQuestions }}</div>
+        <div class="col">Client to Answer: {{ clientToAnswer }}</div>
+        <div class="col">Questions for Reviewer: {{ adminToReview }}</div>
+        <div class="col">{{ status }}% Completed</div>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div>
     <q-splitter v-model="splitterModel" style="height: 800px">
       <template v-slot:before>
         <div class="q-pa-md">
@@ -31,19 +45,25 @@
             <div class="q-mt-md">
               <div class="text-subtitle2 q-mb-xs">Client Answer</div>
               <q-editor v-model="clientResponse" class="q-mb-md" />
+
               <q-select
                 v-model="selectedClientResponse"
                 :options="clientResponses"
+                label="Client"
                 style="width: 200px"
                 class="q-mb-md"
+                @update:model-value="updateClientResponse"
               />
+
               <div class="text-subtitle2 q-mb-xs">Reviewer Comment</div>
               <q-editor v-model="reviewerResponse" />
               <q-select
                 v-model="selectedReviewerResponse"
                 :options="reviewerResponses"
+                label="Reviewer"
                 style="width: 200px"
                 class="q-mb-md"
+                @update:model-value="updateReviewerResponse"
               />
             </div>
 
@@ -64,18 +84,52 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 export default {
   setup() {
     const splitterModel = ref(20);
     const selected = ref(null);
     const clientResponse = ref("");
+
     const reviewerResponse = ref("");
-    const clientResponses = ref([]);
-    const reviewerResponses = ref([]);
-    const selectedClientResponse = ref(null);
-    const selectedReviewerResponse = ref(null);
+
+    const clientResponses = ref([
+      {
+        name: "Client 1",
+        date: "2023-05-18",
+        response: "Client Response 1",
+        label: "Client 1 - 2023-05-10",
+      },
+      {
+        name: "Client 2",
+        date: "2023-05-19",
+        response: "Client Response 2",
+        label: "Client 2 - 2023-05-08",
+      },
+    ]);
+
+    const reviewerResponses = ref([
+      {
+        name: "Reviewer 1",
+        date: "2023-05-20",
+        response: "Reviewer Comment 1",
+        label: "Reviewer 1 - 2023-05-10",
+      },
+      {
+        name: "Reviewer 2",
+        date: "2023-05-21",
+        response: "Reviewer Comment 2",
+        label: "Reviewer 2 - 2023-05-09",
+      },
+    ]);
+
+    const selectedClientResponse = ref(
+      clientResponses.value[clientResponses.value.length - 1]
+    );
+    const selectedReviewerResponse = ref(
+      reviewerResponses.value[reviewerResponses.value.length - 1]
+    );
 
     const groups = ref([
       {
@@ -117,13 +171,33 @@ export default {
     });
 
     const submit = () => {
-      clientResponses.value.push(clientResponse.value);
-      reviewerResponses.value.push(reviewerResponse.value);
+      const clientNameDate = `Client X - ${
+        new Date().toISOString().split("T")[0]
+      }`;
+      const reviewerNameDate = `Reviewer X - ${
+        new Date().toISOString().split("T")[0]
+      }`;
+
+      clientResponses.value.push({
+        name: "Client X",
+        date: new Date().toISOString().split("T")[0],
+        response: clientResponse.value,
+        label: clientNameDate,
+      });
+
+      reviewerResponses.value.push({
+        name: "Reviewer X",
+        date: new Date().toISOString().split("T")[0],
+        response: reviewerResponse.value,
+        label: reviewerNameDate,
+      });
 
       clientResponse.value = "";
       reviewerResponse.value = "";
-      selectedClientResponse.value = null;
-      selectedReviewerResponse.value = null;
+      selectedClientResponse.value =
+        clientResponses.value[clientResponses.value.length - 1];
+      selectedReviewerResponse.value =
+        reviewerResponses.value[reviewerResponses.value.length - 1];
     };
 
     const nextQuestion = () => {
@@ -135,6 +209,25 @@ export default {
         selected.value = flattenedNodes.value[nextIndex].label;
       }
     };
+
+    const updateClientResponse = (selectedObject) => {
+      clientResponse.value = selectedObject ? selectedObject.response : "";
+    };
+
+    const updateReviewerResponse = (selectedObject) => {
+      reviewerResponse.value = selectedObject ? selectedObject.response : "";
+    };
+
+    onMounted(() => {
+      clientResponse.value = selectedClientResponse.value.response;
+      reviewerResponse.value = selectedReviewerResponse.value.response;
+    });
+
+    const projectName = ref("Test 1");
+    const totalQuestions = ref(300);
+    const clientToAnswer = ref(150);
+    const adminToReview = ref(50);
+    const status = ref(50); // You can calculate this based on your data
 
     return {
       splitterModel,
@@ -149,6 +242,14 @@ export default {
       selectedReviewerResponse,
       submit,
       nextQuestion,
+      updateClientResponse,
+      updateReviewerResponse,
+
+      projectName,
+      totalQuestions,
+      clientToAnswer,
+      adminToReview,
+      status,
     };
   },
 };

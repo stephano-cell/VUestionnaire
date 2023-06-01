@@ -8,6 +8,7 @@ const routes = [
         path: "/admin/user/list",
         component: () => import("pages/admin/ListUsers.vue"),
       },
+
       {
         path: "/admin/user/new",
         component: () => import("pages/admin/ViewUser.vue"),
@@ -45,6 +46,11 @@ const routes = [
       {
         path: "/admin/project/review",
         component: () => import("pages/admin/ReviewProject.vue"),
+      },
+
+      {
+        path: "/admin/project/clone",
+        component: () => import("pages/admin/CloneProject.vue"),
       },
       {
         path: "/admin/question/manage",

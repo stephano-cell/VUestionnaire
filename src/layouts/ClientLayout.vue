@@ -10,7 +10,12 @@
           outline
           @click="back"
           style="margin-right: 10px"
-          v-if="router.currentRoute.value.path !== '/client/project/list'"
+          v-if="
+            !(
+              (router.currentRoute.value.path == '/session/') |
+              (router.currentRoute.value.path == '/session')
+            )
+          "
           >back</q-btn
         >
         <q-btn outline @click="logout">Logout</q-btn>
@@ -36,7 +41,7 @@ export default defineComponent({
 
     const logout = () => {
       store.logout();
-      router.replace("/login");
+      router.replace("/");
     };
     const back = () => {
       router.back("/client/project/list");

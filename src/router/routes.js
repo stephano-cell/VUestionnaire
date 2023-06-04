@@ -1,85 +1,84 @@
 const routes = [
   {
-    path: "/",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
-      { path: "", component: () => import("pages/IndexPage.vue") },
-      {
-        path: "/admin/user/list",
-        component: () => import("pages/admin/ListUsers.vue"),
-      },
-
-      {
-        path: "/admin/user/new",
-        component: () => import("pages/admin/ViewUser.vue"),
-        props: () => ({
-          mode: "new",
-        }),
-      },
-      {
-        path: "/admin/user/edit",
-        component: () => import("pages/admin/ViewUser.vue"),
-        props: (route) => ({
-          mode: "edit",
-          id: route.params.id,
-        }),
-      },
-      {
-        path: "/admin/project/list",
-        component: () => import("pages/admin/ListProjects.vue"),
-      },
-      {
-        path: "/admin/project/new",
-        component: () => import("pages/admin/ViewProjects.vue"),
-        props: () => ({
-          mode: "new",
-        }),
-      },
-      {
-        path: "/admin/project/edit",
-        component: () => import("pages/admin/ViewProjects.vue"),
-        props: (route) => ({
-          mode: "edit",
-          id: route.params.id,
-        }),
-      },
-      {
-        path: "/admin/project/review",
-        component: () => import("pages/admin/ReviewProject.vue"),
-      },
-
-      {
-        path: "/admin/project/clone",
-        component: () => import("pages/admin/CloneProject.vue"),
-      },
-      {
-        path: "/admin/question/manage",
-        component: () => import("pages/admin/ViewGroups.vue"),
-      },
-    ],
-  },
-  {
-    path: "/client/project/list",
-    component: () => import("layouts/ClientLayout.vue"),
-    children: [
-      {
-        path: "/client/project/list",
-        component: () => import("pages/client/ListProjectsClient.vue"),
-      },
-      {
-        path: "/client/project/review",
-        component: () => import("pages/client/AnswerProjectsClient.vue"),
-      },
-    ],
-  },
-  {
-    path: "/login",
+    path: "",
     name: "login",
     component: () => import("pages/LoginPage.vue"),
     props: (route) => ({
       redirect: route.query.redirect,
     }),
   },
+  {
+    path: "/admin",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/admin/IndexPage.vue") },
+      {
+        path: "user/list",
+        component: () => import("pages/admin/ListUsers.vue"),
+      },
+      {
+        path: "user/new",
+        component: () => import("pages/admin/ViewUser.vue"),
+        props: () => ({
+          mode: "new",
+        }),
+      },
+      {
+        path: "user/edit",
+        component: () => import("pages/admin/ViewUser.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
+      {
+        path: "project/list",
+        component: () => import("pages/admin/ListProjects.vue"),
+      },
+      {
+        path: "project/new",
+        component: () => import("pages/admin/ViewProjects.vue"),
+        props: () => ({
+          mode: "new",
+        }),
+      },
+      {
+        path: "project/edit",
+        component: () => import("pages/admin/ViewProjects.vue"),
+        props: (route) => ({
+          mode: "edit",
+          id: route.params.id,
+        }),
+      },
+      {
+        path: "project/review",
+        component: () => import("pages/admin/ReviewProject.vue"),
+      },
+      {
+        path: "project/clone",
+        component: () => import("pages/admin/CloneProject.vue"),
+      },
+      {
+        path: "question/manage",
+        component: () => import("pages/admin/ViewGroups.vue"),
+      },
+    ],
+  },
+  {
+    path: "/session/",
+    component: () => import("layouts/ClientLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/client/ListProjectsClient.vue"),
+      },
+      {
+        path: "answer",
+        component: () => import("pages/client/AnswerProjectsClient.vue"),
+      },
+    ],
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

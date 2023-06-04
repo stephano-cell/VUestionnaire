@@ -38,7 +38,10 @@ export default route(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     const store = useAppStore();
-    if (to.name !== "login" && !store.authenticated)
+    if (
+      (to.path.startsWith("/admin") && store.authenticated?.type !== "admin") ||
+      (to.name !== "login" && !store.authenticated)
+    )
       next({ name: "login", query: { redirect: to.path } });
     else next();
   });

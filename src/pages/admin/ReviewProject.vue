@@ -298,8 +298,6 @@ export default {
         label: reviewerNameDate,
       });
 
-      reviewerResponse.value = "";
-
       selectedReviewerResponse.value =
         reviewerResponses.value[reviewerResponses.value.length - 1];
     };

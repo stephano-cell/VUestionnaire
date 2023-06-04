@@ -33,7 +33,6 @@ export default defineComponent({
   },
   setup(props) {
     const { redirect } = toRefs(props);
-    console.log("Redirection: " + redirect?.value);
     const username = ref("admin");
     const password = ref("pass");
     const router = useRouter();
@@ -41,9 +40,16 @@ export default defineComponent({
 
     const login = () => {
       // Call authenticate with the value properties of username and password
-      if (store.authenticate(username.value, password.value)) {
-        console.log("Navigating");
-        router.replace(redirect?.value ?? "/");
+      const auth = store.authenticate(username.value, password.value);
+      if (auth) {
+        var dest = redirect?.value;
+        if (dest == "/") dest = null;
+        console.log("Redirect to " + dest);
+        if (auth?.type == "admin") {
+          router.replace(dest ?? "/admin/");
+        } else if (auth?.type == "client") {
+          router.replace(dest ?? "/session/");
+        }
       }
     };
 

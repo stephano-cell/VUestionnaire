@@ -8,10 +8,9 @@
         :class="tableClass"
         tabindex="0"
         title="Users"
-        :rows="rows"
+        :rows="userRecords"
         :columns="columns"
         row-key="name"
-        selection="single"
         v-model:selected="selected"
         v-model:pagination="pagination"
         :filter="filter"
@@ -44,7 +43,7 @@
         </template>
         <template v-slot:body-cell-edit="props">
           <q-td :props="props">
-            <q-btn flat icon="edit" @click="editRow(props.row)" />
+            <q-btn flat icon="edit" @click="editUser(props.row)" />
           </q-td>
         </template>
       </q-table>
@@ -55,32 +54,32 @@
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
 import { QSelect } from "quasar";
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
 
 const columns = [
   {
     name: "username",
     required: true,
-    label: "username",
+    label: "Username",
     align: "left",
-    field: (row) => row.name,
+    field: "username",
     format: (val) => `${val}`,
     sortable: true,
   },
-
   {
-    name: "fullname",
+    name: "fullName",
     align: "center",
+    field: "fullName",
     label: "Full Name",
-    field: "fullname",
     sortable: true,
   },
   { name: "email", label: "email", field: "email" },
-  { name: "company", label: "Company", field: "company", sortable: true },
-
+  { name: "company", label: "Company", field: "companyName", sortable: true },
   {
     name: "assigned_projects",
     label: "Assigned Projects",
-    field: "assigned_projects",
+    field: "project",
     format: (val) => {
       if (val && val.length > 0) {
         return `<q-select :options="${JSON.stringify(val)}" />`;
@@ -90,7 +89,6 @@ const columns = [
     },
   },
   { name: "role", label: "role", field: "role", sortable: true },
-
   {
     name: "edit",
     label: "",
@@ -100,50 +98,53 @@ const columns = [
   },
 ];
 
-const rowsData = [
-  {
-    id: 1,
-    name: "sm",
-    fullname: "Stephanos Massouras",
-    company: "VUbiquity",
-    email: "s.massouras@vubqiquity.com",
-    role: "admin",
-  },
-  {
-    id: 2,
-    name: "sm2",
-    fullname: "Stephanos 2",
-    company: "VUbiquity2",
-    email: "s.massouras2@vu.com",
-    assigned_projects: ["project1", "project2"],
-    role: "client",
-  },
-];
-const rows = rowsData.map((row) => {
-  if (row.assigned_projects && row.assigned_projects.length > 0) {
-    return {
-      ...row,
-      selected_project: row.assigned_projects[0], // Initialize with the first project in the array
-    };
-  }
-  return row;
-});
-
 export default {
   setup() {
     const tableRef = ref(null);
     const navigationActive = ref(false);
     const pagination = ref({});
     const selected = ref([]);
+    const store = useAppStore();
+    const router = useRouter();
+    const editUser = (info) => {
+      router.push(`/admin/user/edit?id=` + info.id);
+    };
+    const usersData = computed(() => store.usersData);
+    console.log(store.usersData);
+    const userRecords = usersData.value.map((row) => {
+      if (row.assigned_projects && row.assigned_projects.length > 0) {
+        return {
+          ...row,
+          selected_project: row.assigned_projects[0], // Initialize with the first project in the array
+        };
+      }
+      return row;
+    });
+
+    store.installActions([
+      {
+        label: "New User",
+        callback: () => {
+          router.push("/admin/user/new");
+        },
+      },
+      {
+        label: "Delete all",
+        callback: () => {
+          store.deleteAllUsers();
+        },
+      },
+    ]);
 
     return {
+      editUser,
       tableRef,
       navigationActive,
       filter: ref(""),
       selected,
       pagination,
       columns,
-      rows,
+      userRecords,
 
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null

@@ -38,6 +38,7 @@ export default route(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     const store = useAppStore();
+    store.installActions();
     if (
       (to.path.startsWith("/admin") && store.authenticated?.type !== "admin") ||
       (to.name !== "login" && !store.authenticated)

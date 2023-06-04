@@ -76,17 +76,6 @@
           filter-placeholder="Search projects"
         />
       </template>
-
-      <div>
-        <q-btn label="Submit" type="submit" color="primary" />
-        <q-btn
-          label="Reset"
-          type="reset"
-          color="primary"
-          flat
-          class="q-ml-sm"
-        />
-      </div>
     </q-form>
   </q-page>
 </template>
@@ -94,7 +83,9 @@
 <script>
 import { computed, ref } from "vue";
 import useQuasar from "quasar/src/composables/use-quasar.js";
-
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
+import { v4 } from "uuid";
 export default {
   props: {
     mode: {
@@ -106,7 +97,9 @@ export default {
       required: false,
     },
   },
-  setup() {
+  setup(props) {
+    const store = useAppStore();
+    const router = useRouter();
     const $q = useQuasar();
     const username = ref(null);
     const fullName = ref(null);
@@ -131,6 +124,31 @@ export default {
       { label: "client", value: "client" },
     ];
 
+    console.log(props);
+    if (props.mode == "new") {
+      store.installActions([
+        {
+          label: "Insert",
+          callback: () => {
+            // TODO: Check all data
+            store.insertNewUser({
+              id: v4(),
+              username: username.value,
+              fullName: fullName.value,
+              email: email.value,
+              companyName: companyName.value,
+              password: password.value,
+              project: project.value,
+            });
+            router.back();
+          },
+        },
+      ]);
+    } else if (props.mode == "edit") {
+      // TODO: get data
+      store.installActions([{ label: "Save", callback: () => {} }]);
+    }
+
     return {
       username,
       fullName,
@@ -142,24 +160,6 @@ export default {
       allowLogin,
       project,
       sortedProjects, // use sortedProjects instead of projects
-
-      onSubmit() {
-        $q.notify({
-          color: "green-4",
-          textColor: "white",
-          icon: "cloud_done",
-          message: "Submitted",
-        });
-      },
-
-      onReset() {
-        username.value = null;
-        fullName.value = null;
-        email.value = null;
-        companyName.value = null;
-        password.value = null;
-        project.value = [];
-      },
     };
   },
 };

@@ -310,7 +310,7 @@ export default {
       );
       const nextIndex = currentIndex + 1;
       if (nextIndex < flattenedNodes.value.length) {
-        selected.value = flattenedNodes.value[nextIndex];
+        selected.value = flattenedNodes.value[nextIndex].label;
       }
     };
 

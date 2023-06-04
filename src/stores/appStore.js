@@ -32,10 +32,6 @@ export const useAppStore = defineStore("appStore", {
       this.usersData = [];
       LocalStorage.set("users", this.usersData); // set auth to local storage
     },
-    // ------------------------------------- For app
-    installActions(actions) {
-      this.dynamicActions = actions ?? [];
-    },
     logout() {
       console.log("Logout");
       this.auth = null;
@@ -57,6 +53,10 @@ export const useAppStore = defineStore("appStore", {
       //TODO: End
       console.log("Login as: " + JSON.stringify(this.auth));
       return this.auth;
+    },
+    // ------------------------------------- For app
+    installActions(actions) {
+      this.dynamicActions = actions ?? [];
     },
   },
 });

@@ -122,7 +122,7 @@
 
               <q-select
                 v-model="selectedClientResponse"
-                :options="clientResponses"
+                :options="currentResponses"
                 label="Client"
                 style="width: 200px"
                 class="q-mb-md"
@@ -131,7 +131,7 @@
 
               <div class="text-subtitle2 q-mb-xs">Reviewer Comment</div>
               <br />
-              <div v-html="reviewerResponse"></div>
+              <div v-html="latestReviewerResponse.response"></div>
 
               <q-select
                 v-model="selectedReviewerResponse"
@@ -160,7 +160,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 
 export default {
   setup() {
@@ -170,21 +170,7 @@ export default {
 
     const reviewerResponse = ref("");
 
-    const clientResponses = ref([
-      {
-        name: "Client 1",
-        date: "2023-05-18",
-        response: "Client Response 1",
-        label: "Client 1 - 2023-05-10",
-      },
-      {
-        name: "Client 2",
-        date: "2023-05-19",
-        response: "Client Response 2",
-        label: "Client 2 - 2023-05-08",
-      },
-    ]);
-
+    const clientResponses = ref({});
     const reviewerResponses = ref([
       {
         name: "Reviewer 1",
@@ -245,25 +231,6 @@ export default {
       groups.value.forEach(traverse);
       return nodes;
     });
-
-    const submit = () => {
-      const clientNameDate = `Client X - ${
-        new Date().toISOString().split("T")[0]
-      }`;
-
-      clientResponses.value.push({
-        name: "Client X",
-        date: new Date().toISOString().split("T")[0],
-        response: clientResponse.value,
-        label: clientNameDate,
-      });
-
-      clientResponse.value = "";
-
-      selectedClientResponse.value =
-        clientResponses.value[clientResponses.value.length - 1];
-    };
-
     const nextQuestion = () => {
       const currentIndex = flattenedNodes.value.findIndex(
         (node) => node.label === selected.value
@@ -272,6 +239,28 @@ export default {
       if (nextIndex < flattenedNodes.value.length) {
         selected.value = flattenedNodes.value[nextIndex].label;
       }
+    };
+
+    const submit = () => {
+      const clientNameDate = `Client X - ${
+        new Date().toISOString().split("T")[0]
+      }`;
+
+      const response = {
+        name: "Client X",
+        date: new Date().toISOString().split("T")[0],
+        response: clientResponse.value,
+        label: clientNameDate,
+      };
+
+      if (!clientResponses.value[selected.value]) {
+        clientResponses.value[selected.value] = [];
+      }
+
+      clientResponses.value[selected.value].push(response);
+
+      selectedClientResponse.value = response;
+      nextQuestion();
     };
 
     const updateClientResponse = (selectedObject) => {
@@ -283,10 +272,42 @@ export default {
     };
 
     onMounted(() => {
-      clientResponse.value = selectedClientResponse.value.response;
-      reviewerResponse.value = selectedReviewerResponse.value.response;
+      if (clientResponses.value[selected.value]) {
+        const latestResponse =
+          clientResponses.value[selected.value][
+            clientResponses.value[selected.value].length - 1
+          ];
+        clientResponse.value = latestResponse.response;
+        selectedClientResponse.value = latestResponse;
+      }
     });
 
+    watch(clientResponses, (newVal) => {
+      if (newVal[selected.value]) {
+        selectedClientResponse.value =
+          newVal[selected.value][newVal[selected.value].length - 1];
+      }
+    });
+    const currentResponses = computed(() => {
+      return clientResponses.value[selected.value] || [];
+    });
+    watch(selected, (newVal) => {
+      if (clientResponses.value[newVal]) {
+        const latestResponse =
+          clientResponses.value[newVal][
+            clientResponses.value[newVal].length - 1
+          ];
+        clientResponse.value = latestResponse.response;
+        selectedClientResponse.value = latestResponse;
+      } else {
+        clientResponse.value = "";
+        selectedClientResponse.value = null;
+      }
+    });
+
+    const latestReviewerResponse = computed(() => {
+      return reviewerResponses.value[reviewerResponses.value.length - 1];
+    });
     const projectName = ref("Test 1");
     const totalQuestions = ref(300);
     const clientToAnswer = ref(150);
@@ -314,6 +335,8 @@ export default {
       clientToAnswer,
       adminToReview,
       status,
+      currentResponses,
+      latestReviewerResponse,
     };
   },
 };

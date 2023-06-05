@@ -1,9 +1,9 @@
 <template>
   <q-page class="q-pa-md">
     <q-toolbar>
-      <q-toolbar-title>{{ mode }} {{ id }}</q-toolbar-title>
+      <q-toolbar-title>{{ mode }} {{ username }}</q-toolbar-title>
     </q-toolbar>
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <q-form class="q-gutter-md">
       <q-input
         filled
         v-model="username"
@@ -79,13 +79,13 @@
     </q-form>
   </q-page>
 </template>
-
 <script>
 import { computed, ref } from "vue";
 import useQuasar from "quasar/src/composables/use-quasar.js";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
+
 export default {
   props: {
     mode: {
@@ -118,19 +118,29 @@ export default {
     const sortedProjects = computed(() => {
       return [...projects].sort((a, b) => a.name.localeCompare(b.name));
     });
-
     const roles = [
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
     ];
 
-    console.log(props);
-    if (props.mode == "new") {
+    if (props.mode === "edit" && props.id) {
+      const user = store.usersData.find((user) => user.id === props.id);
+      if (user) {
+        username.value = user.username;
+        fullName.value = user.fullName;
+        email.value = user.email;
+        companyName.value = user.companyName;
+        role.value = user.role;
+        allowLogin.value = user.allowLogin;
+        project.value = user.project;
+      }
+    }
+
+    if (props.mode === "new") {
       store.installActions([
         {
           label: "Insert",
           callback: () => {
-            // TODO: Check all data
             store.insertNewUser({
               id: v4(),
               username: username.value,
@@ -139,15 +149,39 @@ export default {
               companyName: companyName.value,
               password: password.value,
               project: project.value,
-              role:role.value,
+              role: role.value,
+              allowLogin: allowLogin.value,
             });
             router.back();
           },
         },
       ]);
-    } else if (props.mode == "edit") {
-      // TODO: get data
-      store.installActions([{ label: "Save", callback: () => {} }]);
+    } else if (props.mode === "edit") {
+      store.installActions([
+        {
+          label: "Save",
+          callback: () => {
+            const updatedUser = {
+              id: props.id,
+              username: username.value,
+              fullName: fullName.value,
+              email: email.value,
+              companyName: companyName.value,
+              password: password.value,
+              role: role.value,
+              allowLogin: allowLogin.value,
+              project: project.value,
+            };
+            const userIndex = store.usersData.findIndex(
+              (user) => user.id === props.id
+            );
+            if (userIndex !== -1) {
+              store.usersData[userIndex] = updatedUser;
+              router.back();
+            }
+          },
+        },
+      ]);
     }
 
     return {
@@ -160,7 +194,7 @@ export default {
       roles,
       allowLogin,
       project,
-      sortedProjects, // use sortedProjects instead of projects
+      sortedProjects,
     };
   },
 };

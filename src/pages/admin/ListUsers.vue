@@ -36,11 +36,12 @@
             <q-select
               v-if="props.row.role == 'client'"
               v-model="props.row.selected_project"
-              :options="props.row.assigned_projects"
+              :options="props.row.project"
             />
             <span v-else>-</span>
           </q-td>
         </template>
+
         <template v-slot:body-cell-edit="props">
           <q-td :props="props">
             <q-btn flat icon="edit" @click="editUser(props.row)" />
@@ -90,6 +91,20 @@ const columns = [
   },
   { name: "role", label: "role", field: "role", sortable: true },
   {
+    name: "allowLogin",
+    align: "center",
+    label: "Allow Login",
+    field: "allowLogin",
+    format: (val, row) => {
+      if (row.role === "admin") {
+        return "";
+      } else {
+        return val ? "Yes" : "No";
+      }
+    },
+    sortable: true,
+  },
+  {
     name: "edit",
     label: "",
     align: "center",
@@ -107,15 +122,16 @@ export default {
     const store = useAppStore();
     const router = useRouter();
     const editUser = (info) => {
-      router.push(`/admin/user/edit?id=` + info.id);
+      router.push(`/admin/user/edit/` + info.id);
     };
+
     const usersData = computed(() => store.usersData);
     console.log(store.usersData);
     const userRecords = usersData.value.map((row) => {
-      if (row.assigned_projects && row.assigned_projects.length > 0) {
+      if (row.project && row.project.length > 0) {
         return {
           ...row,
-          selected_project: row.assigned_projects[0], // Initialize with the first project in the array
+          selected_project: row.project[0], // Initialize with the first project in the array
         };
       }
       return row;

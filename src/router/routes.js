@@ -24,7 +24,7 @@ const routes = [
         }),
       },
       {
-        path: "user/edit",
+        path: "user/edit/:id",
         component: () => import("pages/admin/ViewUser.vue"),
         props: (route) => ({
           mode: "edit",

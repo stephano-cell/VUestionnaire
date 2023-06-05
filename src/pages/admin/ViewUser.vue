@@ -139,6 +139,7 @@ export default {
               companyName: companyName.value,
               password: password.value,
               project: project.value,
+              role:role.value,
             });
             router.back();
           },

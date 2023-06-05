@@ -100,7 +100,7 @@ export default {
   setup(props) {
     const store = useAppStore();
     const router = useRouter();
-    const $q = useQuasar();
+
     const username = ref(null);
     const fullName = ref(null);
     const email = ref(null);

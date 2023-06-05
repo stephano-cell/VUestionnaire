@@ -81,7 +81,6 @@
 </template>
 <script>
 import { computed, ref } from "vue";
-import useQuasar from "quasar/src/composables/use-quasar.js";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";

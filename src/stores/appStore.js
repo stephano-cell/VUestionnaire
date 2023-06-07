@@ -7,6 +7,7 @@ export const useAppStore = defineStore("appStore", {
     auth: LocalStorage.getItem("auth") || null, // get auth from local storage
     usersData: LocalStorage.getItem("users") || [], // get users from local storage
     groupsData: LocalStorage.getItem("groups") || [], // get groups from local storage
+    projectData: LocalStorage.getItem("projects") || [], // get projects from local storage
   }),
   getters: {
     getActions() {
@@ -29,7 +30,10 @@ export const useAppStore = defineStore("appStore", {
       this.usersData.push(newUser);
       LocalStorage.set("users", this.usersData); // set auth to local storage
     },
-
+    insertNewProject(newProject) {
+      this.usersData.push(newProject);
+      LocalStorage.set("projects", this.projectData); // set projects to local storage
+    },
     deleteAllUsers() {
       this.usersData = [];
       LocalStorage.set("users", this.usersData); // set auth to local storage

@@ -140,6 +140,8 @@
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
 import { QSelect } from "quasar";
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
 
 const columns = [
   {
@@ -230,7 +232,7 @@ const rowsData = [
     status: "completed: 50%",
   },
   {
-    id: 1,
+    id: 2,
     projectName: "Tvod EST SVOD",
 
     company: "Spidernet",
@@ -259,14 +261,33 @@ export default {
     const navigationActive = ref(false);
     const pagination = ref({});
     const selected = ref([]);
+    const store = useAppStore();
+    const router = useRouter();
 
     const onRowClick = (evt, row) => {
       console.log("Row clicked: ", row);
       // Do something when a row is clicked
     };
 
+    store.installActions([
+      {
+        label: "New Project",
+        callback: () => {
+          router.push("/admin/project/new");
+        },
+      },
+      {
+        label: "Clone Project",
+        callback: () => {
+          router.push("/admin/project/clone");
+        },
+      },
+    ]);
+
     return {
       tableRef,
+      store,
+      router,
       navigationActive,
       filter: ref(""),
       selected,

@@ -18,7 +18,7 @@
           />
           <q-tree
             :nodes="groups"
-            node-key="label"
+            node-key="id"
             selected-color="primary"
             v-model:selected="selected"
             default-expand-all
@@ -29,15 +29,15 @@
 
       <template v-slot:after>
         <q-tab-panels
-          v-model="selected"
+          v-model="selectedNodeId"
           animated
           transition-prev="jump-up"
           transition-next="jump-up"
         >
           <q-tab-panel
             v-for="node in flattenedNodes"
-            :key="node.label"
-            :name="node.label"
+            :key="node.id"
+            :name="node.id"
           >
             <div class="text-h4 q-mb-md">{{ node.label }}</div>
             <p v-html="node.description"></p>
@@ -137,8 +137,11 @@
             filled
             v-model="selectedGroup"
             :options="groupOptions"
+            option-value="value"
+            option-label="label"
             label="Select a group"
           />
+
           <q-editor
             filled
             v-model="questionDescription"
@@ -194,7 +197,7 @@
   </div>
 </template>
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
@@ -205,6 +208,13 @@ export default {
     const selected = ref("Food");
     const store = useAppStore();
     const router = useRouter();
+
+    const selectedNodeId = computed(() => {
+      const node = flattenedNodes.value.find(
+        (node) => node.id === selected.value
+      );
+      return node ? node.id : null;
+    });
 
     const groups = ref([]);
     const tempGroups = ref([]); // Temporary copy of groups
@@ -219,15 +229,32 @@ export default {
     });
 
     const editSelected = () => {
-      const group = tempGroups.value.find((g) => g.label === selected.value);
+      const group = tempGroups.value.find((g) => g.id === selected.value);
       if (group) {
         // The selected node is a group
-        selectedGroupToEdit.value = selected.value;
+        selectedGroupToEdit.value = {
+          label: group.label,
+          value: group.id,
+        };
         showEditGroupDialog.value = true;
       } else {
         // The selected node is a question
-        selectedQuestionToEdit.value = selected.value;
-        showEditQuestionDialog.value = true;
+        let question = null;
+        tempGroups.value.forEach((group) => {
+          if (group.children) {
+            const found = group.children.find((q) => q.id === selected.value);
+            if (found) {
+              question = found;
+            }
+          }
+        });
+        if (question) {
+          selectedQuestionToEdit.value = {
+            label: question.label,
+            value: question.id,
+          };
+          showEditQuestionDialog.value = true;
+        }
       }
     };
 
@@ -237,6 +264,10 @@ export default {
     const questionTitle = ref("");
     const questionDescription = ref("");
     const selectedGroup = ref("");
+
+    watch(selectedGroup, (newValue) => {
+      console.log("selectedGroup value:", newValue);
+    });
     const showEditGroupDialog = ref(false);
     const selectedGroupToEdit = ref("");
     const newGroupName = ref("");
@@ -263,7 +294,10 @@ export default {
 
     const groupOptions = computed(() => {
       // Map the groups to an array of options for the q-select
-      return tempGroups.value.map((group) => group.label);
+      return tempGroups.value.map((group) => ({
+        label: group.label, // This will be displayed in the dropdown
+        value: group.id, // Use the group's ID for comparison
+      }));
     });
 
     const questionOptions = computed(() => {
@@ -271,17 +305,21 @@ export default {
       let options = [];
       tempGroups.value.forEach((group) => {
         if (group.children) {
-          options = options.concat(group.children.map((child) => child.label));
+          options = options.concat(
+            group.children.map((child) => ({
+              label: child.label,
+              value: child.id, // Use the question's ID for comparison
+            }))
+          );
         }
       });
       return options;
     });
-
     const addGroup = () => {
       // Add a new group to the temporary data
       tempGroups.value.push({
         id: v4(), // Add a UUID to the group
-        label: groupName.value,
+        label: `${groupName.value} (0)`, // Initialize the count to 0
         children: [],
       });
       tempGroups.value.sort((a, b) => a.label.localeCompare(b.label)); // Sort groups alphabetically
@@ -291,7 +329,7 @@ export default {
     const addQuestion = () => {
       // Add a new question to the selected group
       const group = tempGroups.value.find(
-        (g) => g.label === selectedGroup.value
+        (g) => g.id === selectedGroup.value.value
       );
       if (group) {
         group.children.push({
@@ -300,6 +338,8 @@ export default {
           description: questionDescription.value,
         });
         group.children.sort((a, b) => a.label.localeCompare(b.label)); // Sort questions alphabetically
+        // Update the group label to include the new count
+        group.label = `${group.label.split(" ")[0]} (${group.children.length})`;
         questionTitle.value = "";
         questionDescription.value = "";
         selectedGroup.value = "";
@@ -309,11 +349,11 @@ export default {
     const editGroup = () => {
       // Edit the selected group
       const group = tempGroups.value.find(
-        (g) => g.label === selectedGroupToEdit.value
+        (g) => g.id === selectedGroupToEdit.value.value
       );
 
       if (group) {
-        group.label = newGroupName.value;
+        group.label = `${newGroupName.value} (${group.children.length})`;
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
@@ -326,7 +366,7 @@ export default {
       tempGroups.value.forEach((group) => {
         if (group.children) {
           const found = group.children.find(
-            (q) => q.label === selectedQuestionToEdit.value
+            (q) => q.id === selectedQuestionToEdit.value.value
           );
           if (found) {
             question = found;
@@ -346,7 +386,7 @@ export default {
     const deleteGroup = () => {
       // Delete the selected group
       const index = tempGroups.value.findIndex(
-        (g) => g.label === selectedGroupToDelete.value
+        (g) => g.id === selectedGroupToDelete.value.value
       );
       if (index !== -1) {
         tempGroups.value.splice(index, 1);
@@ -360,10 +400,14 @@ export default {
       tempGroups.value.forEach((group) => {
         if (group.children) {
           const index = group.children.findIndex(
-            (q) => q.label === selectedQuestionToDelete.value
+            (q) => q.id === selectedQuestionToDelete.value.value
           );
           if (index !== -1) {
             group.children.splice(index, 1);
+            // Update the group label to include the new count
+            group.label = `${group.label.split(" ")[0]} (${
+              group.children.length
+            })`;
             selectedQuestionToDelete.value = "";
             showDeleteQuestionDialog.value = false;
           }
@@ -414,6 +458,7 @@ export default {
       deleteGroup,
       deleteQuestion,
       editSelected,
+      selectedNodeId,
     };
   },
 };

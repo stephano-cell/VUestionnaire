@@ -58,12 +58,6 @@
       class="q-ma-md q-mb-ml"
     />
     <br />
-    <q-btn
-      label="Save"
-      color="primary"
-      @click="Save = true"
-      class="q-ma-md q-mb-ml"
-    />
 
     <q-dialog v-model="showEditGroupDialog" persistent>
       <q-card>
@@ -108,76 +102,6 @@
             v-model="newQuestionDescription"
             label="New Question Description"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.formatting,
-                  icon: $q.iconSet.editor.formatting,
-                  list: 'no-icons',
-                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                },
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-                {
-                  label: $q.lang.editor.defaultFont,
-                  icon: $q.iconSet.editor.font,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'default_font',
-                    'arial',
-                    'arial_black',
-                    'comic_sans',
-                    'courier_new',
-                    'impact',
-                    'lucida_grande',
-                    'times_new_roman',
-                    'verdana',
-                  ],
-                },
-                'removeFormat',
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen', 'viewsource'],
-            ]"
-            :fonts="{
-              arial: 'Arial',
-              arial_black: 'Arial Black',
-              comic_sans: 'Comic Sans MS',
-              courier_new: 'Courier New',
-              impact: 'Impact',
-              lucida_grande: 'Lucida Grande',
-              times_new_roman: 'Times New Roman',
-              verdana: 'Verdana',
-            }"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -220,76 +144,6 @@
             v-model="questionDescription"
             label="Question Description"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.formatting,
-                  icon: $q.iconSet.editor.formatting,
-                  list: 'no-icons',
-                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                },
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-                {
-                  label: $q.lang.editor.defaultFont,
-                  icon: $q.iconSet.editor.font,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'default_font',
-                    'arial',
-                    'arial_black',
-                    'comic_sans',
-                    'courier_new',
-                    'impact',
-                    'lucida_grande',
-                    'times_new_roman',
-                    'verdana',
-                  ],
-                },
-                'removeFormat',
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
-            :fonts="{
-              arial: 'Arial',
-              arial_black: 'Arial Black',
-              comic_sans: 'Comic Sans MS',
-              courier_new: 'Courier New',
-              impact: 'Impact',
-              lucida_grande: 'Lucida Grande',
-              times_new_roman: 'Times New Roman',
-              verdana: 'Verdana',
-            }"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -339,16 +193,33 @@
     </q-dialog>
   </div>
 </template>
-
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
+import { v4 } from "uuid";
 
 export default {
   setup() {
     const splitterModel = ref(20);
     const selected = ref("Food");
+    const store = useAppStore();
+    const router = useRouter();
+
+    const groups = ref([]);
+    const tempGroups = ref([]); // Temporary copy of groups
+
+    // Load groups from the store when the component is mounted
+    onMounted(() => {
+      const storedGroups = store.groupsData;
+      if (storedGroups) {
+        groups.value = storedGroups;
+        tempGroups.value = JSON.parse(JSON.stringify(storedGroups)); // Make a deep copy of groups
+      }
+    });
+
     const editSelected = () => {
-      const group = groups.value.find((g) => g.label === selected.value);
+      const group = tempGroups.value.find((g) => g.label === selected.value);
       if (group) {
         // The selected node is a group
         selectedGroupToEdit.value = selected.value;
@@ -360,36 +231,12 @@ export default {
       }
     };
 
-    const groups = ref([
-      {
-        label: "Group 1",
-        children: [
-          {
-            label: "Question 1",
-            description: "Description for Question 1",
-          },
-          {
-            label: "Question 2",
-            description: "Description for Question 2",
-          },
-        ],
-      },
-      {
-        label: "Group 2",
-        children: [
-          {
-            label: "Question 3",
-            description: "Description for Question 3",
-          },
-        ],
-      },
-    ]);
-
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
     const groupName = ref("");
-    const questionName = ref("");
-    const questionGroup = ref("");
+    const questionTitle = ref("");
+    const questionDescription = ref("");
+    const selectedGroup = ref("");
     const showEditGroupDialog = ref(false);
     const selectedGroupToEdit = ref("");
     const newGroupName = ref("");
@@ -397,90 +244,72 @@ export default {
     const selectedQuestionToEdit = ref("");
     const newQuestionTitle = ref("");
     const newQuestionDescription = ref("");
-    const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
-    const fontOptions = ref(/* ... */); // font options from previous q-editor
     const showDeleteGroupDialog = ref(false);
     const selectedGroupToDelete = ref("");
     const showDeleteQuestionDialog = ref(false);
     const selectedQuestionToDelete = ref("");
 
-    const deleteGroup = () => {
-      const index = groups.value.findIndex(
-        (g) => g.label === selectedGroupToDelete.value
-      );
-
-      if (index !== -1) {
-        groups.value.splice(index, 1);
-        selectedGroupToDelete.value = "";
-        showDeleteGroupDialog.value = false;
-      }
-    };
-
-    const deleteQuestion = () => {
-      groups.value.forEach((group) => {
-        const index = group.children.findIndex(
-          (c) => c.label === selectedQuestionToDelete.value
-        );
-
-        if (index !== -1) {
-          group.children.splice(index, 1);
-          selectedQuestionToDelete.value = "";
-          showDeleteQuestionDialog.value = false;
+    const flattenedNodes = computed(() => {
+      // Flatten the tree nodes for the q-tab-panels
+      let nodes = [];
+      tempGroups.value.forEach((group) => {
+        nodes.push(group);
+        if (group.children) {
+          nodes = nodes.concat(group.children);
         }
       });
-    };
-    const editQuestion = () => {
-      if (
-        selectedQuestionToEdit.value.trim() === "" ||
-        newQuestionTitle.value.trim() === "" ||
-        newQuestionDescription.value.trim() === ""
-      ) {
-        return;
-      }
+      return nodes;
+    });
 
-      const group = groups.value.find((g) =>
-        g.children.find((c) => c.label === selectedQuestionToEdit.value)
-      );
-
-      if (group) {
-        const question = group.children.find(
-          (c) => c.label === selectedQuestionToEdit.value
-        );
-
-        if (question) {
-          question.label = newQuestionTitle.value;
-          question.description = newQuestionDescription.value;
-
-          // Sort the questions alphabetically within the group.
-          group.children.sort((a, b) => a.label.localeCompare(b.label));
-
-          newQuestionTitle.value = "";
-          newQuestionDescription.value = "";
-          selectedQuestionToEdit.value = "";
-          showEditQuestionDialog.value = false;
-        }
-      }
-    };
+    const groupOptions = computed(() => {
+      // Map the groups to an array of options for the q-select
+      return tempGroups.value.map((group) => group.label);
+    });
 
     const questionOptions = computed(() => {
-      const options = [];
-      groups.value.forEach((group) => {
-        group.children.forEach((child) => {
-          options.push(child.label);
-        });
+      // Map the questions to an array of options for the q-select
+      let options = [];
+      tempGroups.value.forEach((group) => {
+        if (group.children) {
+          options = options.concat(group.children.map((child) => child.label));
+        }
       });
       return options;
     });
 
-    const editGroup = () => {
-      if (
-        selectedGroupToEdit.value.trim() === "" ||
-        newGroupName.value.trim() === ""
-      ) {
-        return;
-      }
+    const addGroup = () => {
+      // Add a new group to the temporary data
+      tempGroups.value.push({
+        label: groupName.value,
+        children: [],
+      });
+      tempGroups.value.sort((a, b) => a.label.localeCompare(b.label)); // Sort groups alphabetically
+      groupName.value = "";
+      showCreateGroupDialog.value = false;
+    };
 
-      const group = groups.value.find(
+    const addQuestion = () => {
+      // Add a new question to the selected group
+      const group = tempGroups.value.find(
+        (g) => g.label === selectedGroup.value
+      );
+      if (group) {
+        group.children.push({
+          label: questionTitle.value,
+          description: questionDescription.value,
+        });
+        group.children.sort((a, b) => a.label.localeCompare(b.label)); // Sort questions alphabetically
+        questionTitle.value;
+        questionTitle.value = "";
+        questionDescription.value = "";
+        selectedGroup.value = "";
+        showCreateQuestionDialog.value = false;
+      }
+    };
+
+    const editGroup = () => {
+      // Edit the selected group
+      const group = tempGroups.value.find(
         (g) => g.label === selectedGroupToEdit.value
       );
 
@@ -489,83 +318,78 @@ export default {
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
-
-        // Sort the groups alphabetically.
-        groups.value.sort((a, b) => a.label.localeCompare(b.label));
       }
     };
 
-    const addGroup = () => {
-      if (groupName.value.trim() === "") {
-        return;
-      }
-
-      groups.value.push({
-        label: groupName.value,
-        children: [],
-      });
-
-      // Sort the groups alphabetically.
-      groups.value.sort((a, b) => a.label.localeCompare(b.label));
-
-      selected.value = groupName.value;
-      groupName.value = "";
-      showCreateGroupDialog.value = false;
-    };
-
-    const questionTitle = ref("");
-    const selectedGroup = ref("");
-    const questionDescription = ref("");
-
-    const addQuestion = () => {
-      if (
-        questionTitle.value.trim() === "" ||
-        questionDescription.value.trim() === "" ||
-        selectedGroup.value.trim() === ""
-      ) {
-        return;
-      }
-
-      const group = groups.value.find((g) => g.label === selectedGroup.value);
-
-      if (group) {
-        group.children.push({
-          label: questionTitle.value,
-          description: questionDescription.value,
-        });
-
-        // Sort the questions alphabetically within the group.
-        group.children.sort((a, b) => a.label.localeCompare(b.label));
-
-        questionTitle.value = "";
-        questionDescription.value = "";
-        selectedGroup.value = "";
-        showCreateQuestionDialog.value = false;
-      }
-    };
-
-    const flattenedNodes = computed(() => {
-      const nodes = [];
-      const traverse = (node) => {
-        if (node.children) {
-          node.children.forEach(traverse);
+    const editQuestion = () => {
+      // Edit the selected question
+      let question = null;
+      tempGroups.value.forEach((group) => {
+        if (group.children) {
+          const found = group.children.find(
+            (q) => q.label === selectedQuestionToEdit.value
+          );
+          if (found) {
+            question = found;
+          }
         }
-        nodes.push(node);
-      };
-      groups.value.forEach(traverse);
-      return nodes;
-    });
+      });
+      if (question) {
+        question.label = newQuestionTitle.value;
+        question.description = newQuestionDescription.value;
+        newQuestionTitle.value = "";
+        newQuestionDescription.value = "";
+        selectedQuestionToEdit.value = "";
+        showEditQuestionDialog.value = false;
+      }
+    };
 
-    const groupOptions = computed(() => {
-      return groups.value.map((group) => group.label);
-    });
+    const deleteGroup = () => {
+      // Delete the selected group
+      const index = tempGroups.value.findIndex(
+        (g) => g.label === selectedGroupToDelete.value
+      );
+      if (index !== -1) {
+        tempGroups.value.splice(index, 1);
+        selectedGroupToDelete.value = "";
+        showDeleteGroupDialog.value = false;
+      }
+    };
+
+    const deleteQuestion = () => {
+      // Delete the selected question
+      tempGroups.value.forEach((group) => {
+        if (group.children) {
+          const index = group.children.findIndex(
+            (q) => q.label === selectedQuestionToDelete.value
+          );
+          if (index !== -1) {
+            group.children.splice(index, 1);
+            selectedQuestionToDelete.value = "";
+            showDeleteQuestionDialog.value = false;
+          }
+        }
+      });
+    };
+
+    store.installActions([
+      {
+        label: "Save",
+        callback: () => {
+          // Copy the temporary data back to groups and save it to the store
+          groups.value = JSON.parse(JSON.stringify(tempGroups.value));
+          store.saveGroups(groups.value);
+          router.back();
+        },
+      },
+    ]);
 
     return {
       splitterModel,
       questionTitle,
       selectedGroup,
       selected,
-      groups,
+      groups: tempGroups, // Use tempGroups in your template
       showCreateGroupDialog,
       showCreateQuestionDialog,
       groupName,
@@ -582,8 +406,6 @@ export default {
       selectedQuestionToEdit,
       newQuestionTitle,
       newQuestionDescription,
-      toolbarOptions,
-      fontOptions,
       editQuestion,
       questionOptions,
       showDeleteGroupDialog,

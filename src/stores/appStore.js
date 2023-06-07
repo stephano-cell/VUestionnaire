@@ -6,6 +6,7 @@ export const useAppStore = defineStore("appStore", {
     dynamicActions: [], // special: this has no storage, each page sets its actions
     auth: LocalStorage.getItem("auth") || null, // get auth from local storage
     usersData: LocalStorage.getItem("users") || [], // get users from local storage
+    groupsData: LocalStorage.getItem("groups") || [], // get groups from local storage
   }),
   getters: {
     getActions() {
@@ -28,6 +29,7 @@ export const useAppStore = defineStore("appStore", {
       this.usersData.push(newUser);
       LocalStorage.set("users", this.usersData); // set auth to local storage
     },
+
     deleteAllUsers() {
       this.usersData = [];
       LocalStorage.set("users", this.usersData); // set auth to local storage
@@ -36,6 +38,10 @@ export const useAppStore = defineStore("appStore", {
       console.log("Logout");
       this.auth = null;
       LocalStorage.remove("auth"); // remove auth from local storage
+    },
+    saveGroups(groups) {
+      this.groupsData = groups;
+      LocalStorage.set("groups", this.groupsData); // set groups to local storage
     },
     authenticate(username, pass) {
       //TODO: Replace with API call /api/login/

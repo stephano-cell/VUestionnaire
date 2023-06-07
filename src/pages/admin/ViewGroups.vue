@@ -280,6 +280,7 @@ export default {
     const addGroup = () => {
       // Add a new group to the temporary data
       tempGroups.value.push({
+        id: v4(), // Add a UUID to the group
         label: groupName.value,
         children: [],
       });
@@ -287,7 +288,6 @@ export default {
       groupName.value = "";
       showCreateGroupDialog.value = false;
     };
-
     const addQuestion = () => {
       // Add a new question to the selected group
       const group = tempGroups.value.find(
@@ -295,18 +295,17 @@ export default {
       );
       if (group) {
         group.children.push({
+          id: v4(), // Add a UUID to the question
           label: questionTitle.value,
           description: questionDescription.value,
         });
         group.children.sort((a, b) => a.label.localeCompare(b.label)); // Sort questions alphabetically
-        questionTitle.value;
         questionTitle.value = "";
         questionDescription.value = "";
         selectedGroup.value = "";
         showCreateQuestionDialog.value = false;
       }
     };
-
     const editGroup = () => {
       // Edit the selected group
       const group = tempGroups.value.find(

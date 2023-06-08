@@ -123,7 +123,7 @@
           <q-td :props="props">
             <q-select
               v-model="props.row.selected_clients"
-              :options="props.row.assigned_clients"
+              :options="props.row.clients"
             />
           </q-td>
         </template>
@@ -156,7 +156,7 @@ const columns = [
   {
     name: "assigned_clients",
     label: "Assigned Clients",
-    field: "assigned_clients",
+    field: "clients",
     format: (val) => {
       if (val && val.length > 0) {
         return `<q-select :options="${JSON.stringify(val)}" />`;

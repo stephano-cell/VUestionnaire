@@ -202,12 +202,13 @@ export default {
               if (role.value === "client") {
                 // First, remove the user from the clients array of all projects
                 store.projectData.forEach((project) => {
-                  const clientIndex = project.clients.indexOf(props.id);
+                  const clientIndex = project.clients.findIndex(
+                    (client) => client.id === props.id
+                  );
                   if (clientIndex !== -1) {
                     project.clients.splice(clientIndex, 1);
                   }
                 });
-
                 // Then, add the user to the clients array of the selected projects
                 project.value.forEach((projectName) => {
                   const project = store.projectData.find(

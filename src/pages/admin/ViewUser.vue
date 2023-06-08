@@ -70,8 +70,8 @@
           multiple
           emit-value
           map-options
-          option-value="name"
-          option-label="name"
+          option-value="projectName"
+          option-label="projectName"
           filter
           filter-placeholder="Search projects"
         />
@@ -84,6 +84,7 @@ import { computed, ref } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
+import { LocalStorage } from "quasar";
 
 export default {
   props: {
@@ -108,15 +109,13 @@ export default {
     const role = ref(null);
     const allowLogin = ref(false);
     const project = ref([]);
-    const projects = [
-      { name: "astesttest1" },
-      { name: "stephanos" },
-      { name: "aristos" },
-      { name: "spiderman" },
-    ];
+
     const sortedProjects = computed(() => {
-      return [...projects].sort((a, b) => a.name.localeCompare(b.name));
+      return [...store.projectData].sort((a, b) =>
+        a.projectName.localeCompare(b.projectName)
+      );
     });
+
     const roles = [
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
@@ -140,8 +139,11 @@ export default {
         {
           label: "Insert",
           callback: () => {
+            const userId = v4(); // Generate a UUID for the new user
+
+            // Insert the new user
             store.insertNewUser({
-              id: v4(),
+              id: userId,
               username: username.value,
               fullName: fullName.value,
               email: email.value,
@@ -151,6 +153,21 @@ export default {
               role: role.value,
               allowLogin: allowLogin.value,
             });
+
+            // If the new user is a client, add the user to the clients array of the selected projects
+            if (role.value === "client") {
+              project.value.forEach((projectName) => {
+                const project = store.projectData.find(
+                  (p) => p.projectName === projectName
+                );
+                if (project) {
+                  project.clients.push(userId);
+                }
+              });
+              // Update the projects in local storage
+              LocalStorage.set("projects", store.projectData);
+            }
+
             router.back();
           },
         },
@@ -176,6 +193,31 @@ export default {
             );
             if (userIndex !== -1) {
               store.usersData[userIndex] = updatedUser;
+
+              // If the updated user is a client, update the clients array of the selected projects
+              if (role.value === "client") {
+                // First, remove the user from the clients array of all projects
+                store.projectData.forEach((project) => {
+                  const clientIndex = project.clients.indexOf(props.id);
+                  if (clientIndex !== -1) {
+                    project.clients.splice(clientIndex, 1);
+                  }
+                });
+
+                // Then, add the user to the clients array of the selected projects
+                project.value.forEach((projectName) => {
+                  const project = store.projectData.find(
+                    (p) => p.projectName === projectName
+                  );
+                  if (project) {
+                    project.clients.push(props.id);
+                  }
+                });
+
+                // Update the projects in local storage
+                LocalStorage.set("projects", store.projectData);
+              }
+
               router.back();
             }
           },

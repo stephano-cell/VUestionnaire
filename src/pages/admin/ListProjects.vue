@@ -216,45 +216,6 @@ const columns = [
   },
 ];
 
-const rowsData = [
-  {
-    id: 1,
-    projectName: "Tvod SVOD",
-    comment: "<p>Test</p>",
-
-    company: "Plex",
-    assigned_clients: ["satephanos", "asdfasfe"],
-
-    last_client_activity: "2023-03-01",
-    client_remaining_questions: "20",
-    last_admin_activity: "2023-03-02",
-    admin_remaining_reviewed: "10",
-    status: "completed: 50%",
-  },
-  {
-    id: 2,
-    projectName: "Tvod EST SVOD",
-
-    company: "Spidernet",
-    assigned_clients: ["satephanos", "hello"],
-
-    last_client_activity: "2022-03-01",
-    client_remaining_questions: "23",
-    last_admin_activity: "2023-03-03",
-    admin_remaining_reviewed: "12",
-    status: "completed: 60%",
-  },
-];
-const rows = rowsData.map((row) => {
-  if (row.assigned_clients && row.assigned_clients.length > 0) {
-    return {
-      ...row,
-      selected_clients: row.assigned_clients[0], // Initialize with the first project in the array
-    };
-  }
-  return row;
-});
-
 export default {
   setup() {
     const tableRef = ref(null);
@@ -263,6 +224,7 @@ export default {
     const selected = ref([]);
     const store = useAppStore();
     const router = useRouter();
+    const rows = computed(() => store.projectData);
 
     const onRowClick = (evt, row) => {
       console.log("Row clicked: ", row);
@@ -287,7 +249,7 @@ export default {
       selected,
       pagination,
       columns,
-      rows: ref(rows),
+      rows,
       onRowClick,
 
       tableClass: computed(() =>

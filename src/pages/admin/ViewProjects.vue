@@ -274,26 +274,11 @@ export default {
 
     const groups = ref([]);
     onMounted(() => {
-      const storedGroups = localStorage.getItem("groups");
-      console.log("storedGroups:", storedGroups); // Add this line for debugging
-      if (storedGroups) {
-        // Remove the prefix "__q_objt|" from storedGroups
-        const jsonStartIndex = storedGroups.indexOf("|") + 1;
-        const jsonGroups = storedGroups.substring(jsonStartIndex);
-
-        let parsedGroups;
-        try {
-          parsedGroups = JSON.parse(jsonGroups);
-        } catch (error) {
-          console.error("Error parsing stored groups:", error);
-          // Handle the error (e.g., display a message or use a fallback value)
-          return;
-        }
-
-        // Assign the parsed groups to the reactive variable
-        groups.value = parsedGroups;
+      if (store.groupsData) {
+        groups.value = store.groupsData;
       }
     });
+
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
     const groupName = ref("");

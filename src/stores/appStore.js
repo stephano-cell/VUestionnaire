@@ -31,7 +31,7 @@ export const useAppStore = defineStore("appStore", {
       LocalStorage.set("users", this.usersData); // set auth to local storage
     },
     insertNewProject(newProject) {
-      this.usersData.push(newProject);
+      this.projectData.push(newProject);
       LocalStorage.set("projects", this.projectData); // set projects to local storage
     },
     deleteAllUsers() {

@@ -62,11 +62,6 @@
           >
             <div class="text-h4 q-mb-md">{{ node.label }}</div>
             <p v-html="node.description"></p>
-            <!-- <q-btn
-              label="Next Question"
-              color="secondary"
-              @click="goToNextQuestion(node)"
-            /> -->
           </q-tab-panel>
         </q-tab-panels>
       </template>
@@ -228,76 +223,6 @@
             v-model="questionDescription"
             label="Question Description"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.formatting,
-                  icon: $q.iconSet.editor.formatting,
-                  list: 'no-icons',
-                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                },
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-                {
-                  label: $q.lang.editor.defaultFont,
-                  icon: $q.iconSet.editor.font,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'default_font',
-                    'arial',
-                    'arial_black',
-                    'comic_sans',
-                    'courier_new',
-                    'impact',
-                    'lucida_grande',
-                    'times_new_roman',
-                    'verdana',
-                  ],
-                },
-                'removeFormat',
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
-            :fonts="{
-              arial: 'Arial',
-              arial_black: 'Arial Black',
-              comic_sans: 'Comic Sans MS',
-              courier_new: 'Courier New',
-              impact: 'Impact',
-              lucida_grande: 'Lucida Grande',
-              times_new_roman: 'Times New Roman',
-              verdana: 'Verdana',
-            }"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -310,11 +235,28 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
+import { v4 } from "uuid";
 
 export default {
-  setup() {
+  props: {
+    mode: {
+      type: String,
+      required: true,
+    },
+    id: {
+      type: String,
+      required: false,
+    },
+  },
+  setup(props) {
     const splitterModel = ref(20);
+    const store = useAppStore();
+    const router = useRouter();
+    const projectName = ref("");
+    const company = ref("");
     const selected = ref("Food");
     const ticked = ref([]);
     const editSelected = () => {
@@ -438,6 +380,7 @@ export default {
       }
 
       groups.value.push({
+        id: v4(), // Assign a UUID to the new group
         label: groupName.value,
         children: [],
       });
@@ -467,6 +410,7 @@ export default {
 
       if (group) {
         group.children.push({
+          id: v4(), // Assign a UUID to the new question
           label: questionTitle.value,
           description: questionDescription.value,
         });
@@ -480,21 +424,6 @@ export default {
         showCreateQuestionDialog.value = false;
       }
     };
-    // const goToNextQuestion = (currentQuestion) => {
-    //   // Filter out the groups, leaving only questions
-    //   const questionsOnly = flattenedNodes.value.filter(
-    //     (node) => node.description
-    //   );
-
-    //   const currentIndex = questionsOnly.findIndex(
-    //     (node) => node.label === currentQuestion.label
-    //   );
-
-    //   if (currentIndex !== -1 && currentIndex < questionsOnly.length - 1) {
-    //     selected.value = questionsOnly[currentIndex + 1].label;
-    //   }
-    // };
-
     const flattenedNodes = computed(() => {
       const nodes = [];
       const traverse = (node) => {
@@ -510,7 +439,22 @@ export default {
     const groupOptions = computed(() => {
       return groups.value.map((group) => group.label);
     });
-
+    if (props.mode === "new") {
+      store.installActions([
+        {
+          label: "CREATE PROJECT",
+          callback: () => {
+            store.insertNewProject({
+              id: v4(),
+              projectName: projectName.value, // Update this line
+              company: company.value,
+              groups: groups.value,
+            });
+            router.back();
+          },
+        },
+      ]);
+    }
     return {
       splitterModel,
       questionTitle,
@@ -539,8 +483,8 @@ export default {
       questionOptions,
       ticked,
       editSelected,
-
-      // goToNextQuestion,
+      projectName,
+      company,
     };
   },
 };

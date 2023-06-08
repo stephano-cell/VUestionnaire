@@ -276,12 +276,6 @@ export default {
           router.push("/admin/project/new");
         },
       },
-      {
-        label: "Clone Project",
-        callback: () => {
-          router.push("/admin/project/clone");
-        },
-      },
     ]);
 
     return {

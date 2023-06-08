@@ -161,7 +161,10 @@ export default {
                   (p) => p.projectName === projectName
                 );
                 if (project) {
-                  project.clients.push(userId);
+                  project.clients.push({
+                    id: userId,
+                    fullName: fullName.value,
+                  });
                 }
               });
               // Update the projects in local storage
@@ -211,7 +214,7 @@ export default {
                     (p) => p.projectName === projectName
                   );
                   if (project) {
-                    project.clients.push(props.id);
+                    project.clients.push({ id: props.id, email: email.value });
                   }
                 });
 

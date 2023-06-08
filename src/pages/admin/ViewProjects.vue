@@ -465,6 +465,7 @@ export default {
               projectName: projectName.value,
               company: company.value,
               groups: copiedGroups,
+              clients: [],
             });
             router.back();
           },

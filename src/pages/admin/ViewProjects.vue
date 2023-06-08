@@ -329,6 +329,9 @@ export default {
         if (question) {
           question.label = newQuestionTitle.value;
           question.description = newQuestionDescription.value;
+          question.checked = ticked.value.includes(newQuestionTitle.value)
+            ? 1
+            : 0; // Add this line
 
           // Sort the questions alphabetically within the group.
           group.children.sort((a, b) => a.label.localeCompare(b.label));
@@ -365,6 +368,7 @@ export default {
 
       if (group) {
         group.label = newGroupName.value;
+        group.checked = ticked.value.includes(newGroupName.value) ? 1 : 0; // Add this line
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
@@ -383,6 +387,7 @@ export default {
         id: v4(), // Assign a UUID to the new group
         label: groupName.value,
         children: [],
+        checked: ticked.value.includes(groupName.value) ? 1 : 0, // Add this line
       });
 
       // Sort the groups alphabetically.
@@ -392,7 +397,6 @@ export default {
       groupName.value = "";
       showCreateGroupDialog.value = false;
     };
-
     const questionTitle = ref("");
     const selectedGroup = ref("");
     const questionDescription = ref("");
@@ -413,6 +417,7 @@ export default {
           id: v4(), // Assign a UUID to the new question
           label: questionTitle.value,
           description: questionDescription.value,
+          checked: ticked.value.includes(questionTitle.value) ? 1 : 0, // Add this line
         });
 
         // Sort the questions alphabetically within the group.

@@ -124,6 +124,7 @@
             <q-select
               v-model="props.row.selected_clients"
               :options="props.row.clients"
+              option-label="email"
             />
           </q-td>
         </template>

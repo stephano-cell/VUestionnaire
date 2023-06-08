@@ -30,6 +30,16 @@ export const useAppStore = defineStore("appStore", {
       this.usersData.push(newUser);
       LocalStorage.set("users", this.usersData); // set auth to local storage
     },
+    updateProjects(projects) {
+      this.projectData = projects;
+      LocalStorage.set("projects", this.projectData);
+    },
+
+    updateUsers(users) {
+      this.usersData = users;
+      LocalStorage.set("users", this.usersData);
+    },
+
     insertNewProject(newProject) {
       this.projectData.push(newProject);
       LocalStorage.set("projects", this.projectData); // set projects to local storage

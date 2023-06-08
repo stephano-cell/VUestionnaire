@@ -84,7 +84,6 @@ import { computed, ref } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
-import { LocalStorage } from "quasar";
 
 export default {
   props: {
@@ -168,8 +167,8 @@ export default {
                 }
               });
               // Update the projects in local storage
-              LocalStorage.set("projects", store.projectData);
-              LocalStorage.set("users", store.usersData);
+              store.updateProjects(store.projectData);
+              store.updateUsers(store.usersData);
             }
 
             router.back();
@@ -181,6 +180,11 @@ export default {
         {
           label: "Save",
           callback: () => {
+            // Get the original user
+            const originalUser = store.usersData.find(
+              (user) => user.id === props.id
+            );
+
             const updatedUser = {
               id: props.id,
               username: username.value,
@@ -218,11 +222,23 @@ export default {
                     project.clients.push({ id: props.id, email: email.value });
                   }
                 });
-
-                // Update the projects in local storage
-                LocalStorage.set("projects", store.projectData);
-                LocalStorage.set("users", store.usersData);
               }
+
+              // If the user's role has changed from 'client' to 'admin', remove the user from the clients array of all projects
+              if (originalUser.role === "client" && role.value === "admin") {
+                store.projectData.forEach((project) => {
+                  const clientIndex = project.clients.findIndex(
+                    (client) => client.id === props.id
+                  );
+                  if (clientIndex !== -1) {
+                    project.clients.splice(clientIndex, 1);
+                  }
+                });
+              }
+
+              // Update the projects and users in the store
+              store.updateProjects(store.projectData);
+              store.updateUsers(store.usersData);
 
               router.back();
             }

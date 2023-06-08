@@ -166,6 +166,7 @@ export default {
               });
               // Update the projects in local storage
               LocalStorage.set("projects", store.projectData);
+              LocalStorage.set("users", store.usersData);
             }
 
             router.back();
@@ -216,6 +217,7 @@ export default {
 
                 // Update the projects in local storage
                 LocalStorage.set("projects", store.projectData);
+                LocalStorage.set("users", store.usersData);
               }
 
               router.back();

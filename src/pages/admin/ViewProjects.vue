@@ -312,7 +312,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 export default {
   setup() {
@@ -332,31 +332,28 @@ export default {
       }
     };
 
-    const groups = ref([
-      {
-        label: "Group 1",
-        children: [
-          {
-            label: "Question 1",
-            description: "Description for Question 1",
-          },
-          {
-            label: "Question 2",
-            description: "Description for Question 2",
-          },
-        ],
-      },
-      {
-        label: "Group 2",
-        children: [
-          {
-            label: "Question 3",
-            description: "Description for Question 3",
-          },
-        ],
-      },
-    ]);
+    const groups = ref([]);
+    onMounted(() => {
+      const storedGroups = localStorage.getItem("groups");
+      console.log("storedGroups:", storedGroups); // Add this line for debugging
+      if (storedGroups) {
+        // Remove the prefix "__q_objt|" from storedGroups
+        const jsonStartIndex = storedGroups.indexOf("|") + 1;
+        const jsonGroups = storedGroups.substring(jsonStartIndex);
 
+        let parsedGroups;
+        try {
+          parsedGroups = JSON.parse(jsonGroups);
+        } catch (error) {
+          console.error("Error parsing stored groups:", error);
+          // Handle the error (e.g., display a message or use a fallback value)
+          return;
+        }
+
+        // Assign the parsed groups to the reactive variable
+        groups.value = parsedGroups;
+      }
+    });
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
     const groupName = ref("");

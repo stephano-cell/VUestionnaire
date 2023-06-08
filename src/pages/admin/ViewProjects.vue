@@ -444,17 +444,29 @@ export default {
         {
           label: "CREATE PROJECT",
           callback: () => {
+            // Create a deep copy of the groups
+            const copiedGroups = JSON.parse(JSON.stringify(groups.value));
+
+            // Assign new UUIDs to the groups and questions in the copy
+            copiedGroups.forEach((group) => {
+              group.id = v4();
+              group.children.forEach((question) => {
+                question.id = v4();
+              });
+            });
+
             store.insertNewProject({
               id: v4(),
-              projectName: projectName.value, // Update this line
+              projectName: projectName.value,
               company: company.value,
-              groups: groups.value,
+              groups: copiedGroups,
             });
             router.back();
           },
         },
       ]);
     }
+
     return {
       splitterModel,
       questionTitle,

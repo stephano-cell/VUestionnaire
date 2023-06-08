@@ -306,8 +306,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
-    <q-btn label="Submit" type="submit" color="primary" class="q-ma-md" />
   </div>
 </template>
 

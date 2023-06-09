@@ -239,7 +239,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
-
+import { LocalStorage } from "quasar";
 export default {
   props: {
     mode: {
@@ -259,6 +259,7 @@ export default {
     const company = ref("");
     const selected = ref("Food");
     const ticked = ref([]);
+
     const editSelected = () => {
       const group = groups.value.find((g) => g.label === selected.value);
       if (group) {
@@ -452,6 +453,45 @@ export default {
     const groupOptions = computed(() => {
       return groups.value.map((group) => group.label);
     });
+    onMounted(() => {
+      if (store.groupsData) {
+        groups.value = JSON.parse(JSON.stringify(store.groupsData)).map(
+          (group) => {
+            group.checked = ticked.value.includes(group.label) ? 1 : 0;
+            group.children = group.children.map((question) => {
+              question.checked = ticked.value.includes(question.label) ? 1 : 0;
+              return question;
+            });
+            return group;
+          }
+        );
+      }
+
+      if (props.mode === "edit" && props.id) {
+        const project = store.projectData.find(
+          (project) => project.id === props.id
+        );
+        if (project) {
+          projectName.value = project.projectName;
+          company.value = project.company;
+          groups.value = project.groups;
+
+          // Populate the ticked array with the labels of the groups and questions that are checked
+          ticked.value = [];
+          project.groups.forEach((group) => {
+            if (group.checked) {
+              ticked.value.push(group.label);
+            }
+            group.children.forEach((question) => {
+              if (question.checked) {
+                ticked.value.push(question.label);
+              }
+            });
+          });
+        }
+      }
+    });
+
     if (props.mode === "new") {
       store.installActions([
         {
@@ -496,8 +536,62 @@ export default {
           },
         },
       ]);
-    }
+    } else if (props.mode === "edit") {
+      store.installActions([
+        {
+          label: "Save",
+          callback: () => {
+            // Update the checked property of the groups and questions
+            groups.value = groups.value.map((group) => {
+              group.children = group.children.map((question) => {
+                question.checked = ticked.value.includes(question.label)
+                  ? 1
+                  : 0;
+                return question;
+              });
+              group.checked = group.children.some(
+                (question) => question.checked === 1
+              )
+                ? 1
+                : 0;
+              return group;
+            });
 
+            // Create a deep copy of the groups
+            const copiedGroups = JSON.parse(JSON.stringify(groups.value));
+
+            // Assign new UUIDs to the groups and questions in the copy
+            copiedGroups.forEach((group) => {
+              group.id = v4();
+              group.children.forEach((question) => {
+                question.id = v4();
+              });
+            });
+
+            // Find the index of the project to update
+            const projectIndex = store.projectData.findIndex(
+              (project) => project.id === props.id
+            );
+
+            if (projectIndex !== -1) {
+              // Update the project
+              store.projectData[projectIndex] = {
+                id: props.id,
+                projectName: projectName.value,
+                company: company.value,
+                groups: copiedGroups,
+                clients: [], // You might want to preserve the existing clients instead of resetting them
+              };
+
+              // Update the projects in local storage
+              LocalStorage.set("projects", store.projectData);
+
+              router.back();
+            }
+          },
+        },
+      ]);
+    }
     return {
       splitterModel,
       questionTitle,

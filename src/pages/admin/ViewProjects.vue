@@ -181,7 +181,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 import { v4 } from "uuid";
-import { LocalStorage } from "quasar";
+
 export default {
   props: {
     mode: {
@@ -530,7 +530,8 @@ export default {
               };
 
               // Update the projects in local storage
-              LocalStorage.set("projects", store.projectData);
+
+              store.updateProjects(store.projectData);
 
               router.back();
             }

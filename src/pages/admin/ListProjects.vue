@@ -131,7 +131,7 @@
 
         <template v-slot:body-cell-edit="props">
           <q-td :props="props">
-            <q-btn flat icon="edit" @click="editRow(props.row)" />
+            <q-btn flat icon="edit" @click="editProject(props.row)" />
           </q-td>
         </template>
       </q-table>
@@ -226,7 +226,9 @@ export default {
     const store = useAppStore();
     const router = useRouter();
     const rows = computed(() => store.projectData);
-
+    const editProject = (info) => {
+      router.push(`/admin/project/edit/` + info.id);
+    };
     const onRowClick = (evt, row) => {
       console.log("Row clicked: ", row);
       // Do something when a row is clicked
@@ -251,6 +253,7 @@ export default {
       pagination,
       columns,
       rows,
+      editProject,
       onRowClick,
 
       tableClass: computed(() =>

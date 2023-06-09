@@ -37,7 +37,6 @@
               v-if="props.row.role == 'client'"
               v-model="props.row.selected_project"
               :options="props.row.project"
-              :option-value="email"
             />
             <span v-else>-</span>
           </q-td>

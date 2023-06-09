@@ -162,7 +162,7 @@ export default {
                 if (project) {
                   project.clients.push({
                     id: userId,
-                    fullName: fullName.value,
+                    fullName: email.value,
                   });
                 }
               });

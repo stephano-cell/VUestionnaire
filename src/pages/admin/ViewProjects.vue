@@ -111,76 +111,6 @@
             label="New Question Description"
             class="q-mb-md"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.formatting,
-                  icon: $q.iconSet.editor.formatting,
-                  list: 'no-icons',
-                  options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                },
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-                {
-                  label: $q.lang.editor.defaultFont,
-                  icon: $q.iconSet.editor.font,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'default_font',
-                    'arial',
-                    'arial_black',
-                    'comic_sans',
-                    'courier_new',
-                    'impact',
-                    'lucida_grande',
-                    'times_new_roman',
-                    'verdana',
-                  ],
-                },
-                'removeFormat',
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
-            :fonts="{
-              arial: 'Arial',
-              arial_black: 'Arial Black',
-              comic_sans: 'Comic Sans MS',
-              courier_new: 'Courier New',
-              impact: 'Impact',
-              lucida_grande: 'Lucida Grande',
-              times_new_roman: 'Times New Roman',
-              verdana: 'Verdana',
-            }"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -588,6 +518,48 @@ export default {
 
               router.back();
             }
+          },
+        },
+        {
+          label: "CLONE",
+          callback: () => {
+            // Update the checked property of the groups and questions
+            groups.value = groups.value.map((group) => {
+              group.children = group.children.map((question) => {
+                question.checked = ticked.value.includes(question.label)
+                  ? 1
+                  : 0;
+                return question;
+              });
+              group.checked = group.children.some(
+                (question) => question.checked === 1
+              )
+                ? 1
+                : 0;
+              return group;
+            });
+
+            // Create a deep copy of the groups
+            const copiedGroups = JSON.parse(JSON.stringify(groups.value));
+
+            // Assign new UUIDs to the groups and questions in the copy
+            copiedGroups.forEach((group) => {
+              group.id = v4();
+              group.children.forEach((question) => {
+                question.id = v4();
+              });
+            });
+
+            // Insert the cloned project
+            store.insertNewProject({
+              id: v4(), // Assign a new UUID to the cloned project
+              projectName: projectName.value,
+              company: company.value,
+              groups: copiedGroups,
+              clients: [], // You might want to preserve the existing clients instead of resetting them
+            });
+
+            router.back();
           },
         },
       ]);

@@ -54,10 +54,7 @@ const routes = [
         path: "project/review",
         component: () => import("pages/admin/ReviewProject.vue"),
       },
-      {
-        path: "project/clone",
-        component: () => import("pages/admin/CloneProject.vue"),
-      },
+
       {
         path: "question/manage",
         component: () => import("pages/admin/ViewGroups.vue"),

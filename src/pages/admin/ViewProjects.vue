@@ -275,7 +275,16 @@ export default {
     const groups = ref([]);
     onMounted(() => {
       if (store.groupsData) {
-        groups.value = JSON.parse(JSON.stringify(store.groupsData));
+        groups.value = JSON.parse(JSON.stringify(store.groupsData)).map(
+          (group) => {
+            group.checked = ticked.value.includes(group.label) ? 1 : 0;
+            group.children = group.children.map((question) => {
+              question.checked = ticked.value.includes(question.label) ? 1 : 0;
+              return question;
+            });
+            return group;
+          }
+        );
       }
     });
 
@@ -396,6 +405,7 @@ export default {
       }
 
       const group = groups.value.find((g) => g.label === selectedGroup.value);
+      console.log(group); // Add this line
 
       if (group) {
         group.children.push({
@@ -434,6 +444,22 @@ export default {
         {
           label: "CREATE PROJECT",
           callback: () => {
+            // Update the checked property of the groups and questions
+            groups.value = groups.value.map((group) => {
+              group.children = group.children.map((question) => {
+                question.checked = ticked.value.includes(question.label)
+                  ? 1
+                  : 0;
+                return question;
+              });
+              group.checked = group.children.some(
+                (question) => question.checked === 1
+              )
+                ? 1
+                : 0;
+              return group;
+            });
+
             // Create a deep copy of the groups
             const copiedGroups = JSON.parse(JSON.stringify(groups.value));
 
@@ -449,7 +475,7 @@ export default {
               id: v4(),
               projectName: projectName.value,
               company: company.value,
-              groups: JSON.parse(JSON.stringify(groups.value)),
+              groups: copiedGroups,
               clients: [],
             });
 

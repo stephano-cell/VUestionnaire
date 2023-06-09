@@ -250,8 +250,6 @@ export default {
     const selectedQuestionToEdit = ref("");
     const newQuestionTitle = ref("");
     const newQuestionDescription = ref("");
-    const toolbarOptions = ref(/* ... */); // toolbar options from previous q-editor
-    const fontOptions = ref(/* ... */); // font options from previous q-editor
 
     const editQuestion = () => {
       if (
@@ -604,8 +602,7 @@ export default {
       selectedQuestionToEdit,
       newQuestionTitle,
       newQuestionDescription,
-      toolbarOptions,
-      fontOptions,
+
       editQuestion,
       questionOptions,
       ticked,

@@ -9,6 +9,7 @@
       :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       class="q-ma-md q-mb-ml"
     />
+
     <q-input
       filled
       v-model="company"
@@ -18,6 +19,17 @@
       :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       class="q-ma-md q-mb-ml"
     />
+
+    <div class="q-ma-md q-mb-ml">
+      <p class="text-h8">Comments</p>
+
+      <q-editor
+        filled
+        v-model="comment"
+        label="comment"
+        :dense="$q.screen.lt.md"
+      />
+    </div>
 
     <q-splitter v-model="splitterModel" style="height: 500px">
       <template v-slot:before>
@@ -189,6 +201,7 @@ export default {
     const company = ref("");
     const selected = ref("Food");
     const ticked = ref([]);
+    const comment = ref("");
 
     const editSelected = () => {
       const group = groups.value.find((g) => g.label === selected.value);
@@ -404,6 +417,7 @@ export default {
         if (project) {
           projectName.value = project.projectName;
           company.value = project.company;
+          comment.value = project.comment;
           groups.value = project.groups;
 
           // Populate the ticked array with the labels of the groups and questions that are checked
@@ -458,6 +472,7 @@ export default {
               id: v4(),
               projectName: projectName.value,
               company: company.value,
+              comment: comment.value, // Add this line
               groups: copiedGroups,
               clients: [],
             });
@@ -509,8 +524,9 @@ export default {
                 id: props.id,
                 projectName: projectName.value,
                 company: company.value,
+                comment: comment.value,
                 groups: copiedGroups,
-                clients: [], // You might want to preserve the existing clients instead of resetting them
+                clients: [],
               };
 
               // Update the projects in local storage
@@ -552,11 +568,12 @@ export default {
 
             // Insert the cloned project
             store.insertNewProject({
-              id: v4(), // Assign a new UUID to the cloned project
+              id: v4(),
               projectName: projectName.value,
               company: company.value,
+              comment: comment.value, // Add this line
               groups: copiedGroups,
-              clients: [], // You might want to preserve the existing clients instead of resetting them
+              clients: [],
             });
 
             router.back();
@@ -594,6 +611,7 @@ export default {
       editSelected,
       projectName,
       company,
+      comment,
     };
   },
 };

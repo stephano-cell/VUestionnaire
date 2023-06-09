@@ -377,12 +377,15 @@ export default {
         return;
       }
 
-      groups.value.push({
-        id: v4(), // Assign a UUID to the new group
-        label: groupName.value,
-        children: [],
-        checked: ticked.value.includes(groupName.value) ? 1 : 0, // Add this line
-      });
+      groups.value = [
+        ...groups.value,
+        {
+          id: v4(), // Assign a UUID to the new group
+          label: groupName.value,
+          children: [],
+          checked: ticked.value.includes(groupName.value) ? 1 : 0, // Add this line
+        },
+      ];
 
       // Sort the groups alphabetically.
       groups.value.sort((a, b) => a.label.localeCompare(b.label));
@@ -391,6 +394,7 @@ export default {
       groupName.value = "";
       showCreateGroupDialog.value = false;
     };
+
     const questionTitle = ref("");
     const selectedGroup = ref("");
     const questionDescription = ref("");
@@ -405,15 +409,17 @@ export default {
       }
 
       const group = groups.value.find((g) => g.label === selectedGroup.value);
-      console.log(group); // Add this line
 
       if (group) {
-        group.children.push({
-          id: v4(), // Assign a UUID to the new question
-          label: questionTitle.value,
-          description: questionDescription.value,
-          checked: ticked.value.includes(questionTitle.value) ? 1 : 0, // Add this line
-        });
+        group.children = [
+          ...group.children,
+          {
+            id: v4(), // Assign a UUID to the new question
+            label: questionTitle.value,
+            description: questionDescription.value,
+            checked: ticked.value.includes(questionTitle.value) ? 1 : 0, // Add this line
+          },
+        ];
 
         // Sort the questions alphabetically within the group.
         group.children.sort((a, b) => a.label.localeCompare(b.label));

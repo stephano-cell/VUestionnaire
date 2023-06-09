@@ -148,7 +148,7 @@ export default {
               email: email.value,
               companyName: companyName.value,
               password: password.value,
-              project: project.value,
+
               role: role.value,
               allowLogin: allowLogin.value,
             });
@@ -193,7 +193,6 @@ export default {
               password: password.value,
               role: role.value,
               allowLogin: allowLogin.value,
-              project: project.value,
             };
             const userIndex = store.usersData.findIndex(
               (user) => user.id === props.id

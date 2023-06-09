@@ -162,7 +162,6 @@ export default {
                 if (project) {
                   project.clients.push({
                     id: userId,
-                    fullName: email.value,
                   });
                 }
               });
@@ -219,7 +218,7 @@ export default {
                     (p) => p.projectName === projectName
                   );
                   if (project) {
-                    project.clients.push({ id: props.id, email: email.value });
+                    project.clients.push({ id: props.id });
                   }
                 });
               }

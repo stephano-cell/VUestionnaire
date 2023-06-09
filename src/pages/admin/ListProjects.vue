@@ -44,8 +44,9 @@
           <q-td :props="props">
             <q-select
               v-model="props.row.selected_clients"
-              :options="props.row.clients"
-              option-label="email"
+              :options="userOptions"
+              option-label="label"
+              option-value="value"
             />
           </q-td>
         </template>
@@ -145,6 +146,12 @@ export default {
     const pagination = ref({});
     const selected = ref([]);
     const store = useAppStore();
+    const userOptions = computed(() => {
+      return store.usersData.map((user) => ({
+        label: user.email,
+        value: user.id,
+      }));
+    });
     const router = useRouter();
     const rows = computed(() => store.projectData);
     const editProject = (info) => {
@@ -173,6 +180,7 @@ export default {
       selected,
       pagination,
       columns,
+      userOptions,
       rows,
       editProject,
       onRowClick,

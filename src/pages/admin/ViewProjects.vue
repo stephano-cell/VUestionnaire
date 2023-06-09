@@ -272,6 +272,13 @@ export default {
       }
     };
 
+    const computedGroups = computed(() => {
+      return groups.value.map((group) => ({
+        ...group,
+        label: `${group.label.split(" ")[0]} (${group.children.length})`,
+      }));
+    });
+
     const groups = ref([]);
     onMounted(() => {
       if (store.groupsData) {
@@ -496,7 +503,7 @@ export default {
       questionTitle,
       selectedGroup,
       selected,
-      groups,
+      groups: computedGroups,
       showCreateGroupDialog,
       showCreateQuestionDialog,
       groupName,

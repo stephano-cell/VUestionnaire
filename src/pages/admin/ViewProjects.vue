@@ -20,16 +20,31 @@
       class="q-ma-md q-mb-ml"
     />
 
-    <div class="q-ma-md q-mb-ml">
-      <p class="text-h8">Comments</p>
-
-      <q-editor
-        filled
-        v-model="comment"
-        label="comment"
-        :dense="$q.screen.lt.md"
+    <div class="q-pa-md">
+      <q-btn
+        label="Add Comment"
+        color="primary"
+        @click="showCommentDialog = true"
+        class="q-ma-md"
       />
     </div>
+
+    <q-dialog v-model="showCommentDialog" persistent>
+      <q-card>
+        <q-card-section>
+          <q-editor
+            filled
+            v-model="comment"
+            label="comment"
+            :dense="$q.screen.lt.md"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Save" color="primary" @click="saveComment" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <q-splitter v-model="splitterModel" style="height: 500px">
       <template v-slot:before>
@@ -202,6 +217,13 @@ export default {
     const selected = ref("Food");
     const ticked = ref([]);
     const comment = ref("");
+    const saveComment = () => {
+      // Save your comment here
+      console.log(comment.value);
+
+      // Close the dialog
+      showCommentDialog.value = false;
+    };
 
     const editSelected = () => {
       const group = groups.value.find((g) => g.label === selected.value);
@@ -241,6 +263,8 @@ export default {
 
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
+    const showCommentDialog = ref(false);
+
     const groupName = ref("");
 
     const showEditGroupDialog = ref(false);
@@ -588,6 +612,8 @@ export default {
       groups: computedGroups,
       showCreateGroupDialog,
       showCreateQuestionDialog,
+      showCommentDialog,
+      saveComment,
       groupName,
       addGroup,
       addQuestion,

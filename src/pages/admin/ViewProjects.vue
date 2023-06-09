@@ -275,7 +275,7 @@ export default {
     const groups = ref([]);
     onMounted(() => {
       if (store.groupsData) {
-        groups.value = store.groupsData;
+        groups.value = JSON.parse(JSON.stringify(store.groupsData));
       }
     });
 
@@ -449,9 +449,10 @@ export default {
               id: v4(),
               projectName: projectName.value,
               company: company.value,
-              groups: copiedGroups,
+              groups: JSON.parse(JSON.stringify(groups.value)),
               clients: [],
             });
+
             router.back();
           },
         },

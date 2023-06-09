@@ -43,7 +43,7 @@ const routes = [
         }),
       },
       {
-        path: "project/edit",
+        path: "project/edit/:id",
         component: () => import("pages/admin/ViewProjects.vue"),
         props: (route) => ({
           mode: "edit",

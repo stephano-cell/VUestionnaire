@@ -147,11 +147,20 @@ export default {
     const selected = ref([]);
     const store = useAppStore();
     const userOptions = computed(() => {
-      return store.usersData.map((user) => ({
-        label: user.email,
-        value: user.id,
-      }));
+      // Get the IDs of all clients assigned to projects
+      const assignedClientIds = store.projectData.flatMap((project) =>
+        project.clients.map((client) => client.id)
+      );
+
+      // Filter the users to only include those whose IDs are in the list of assigned client IDs
+      return store.usersData
+        .filter((user) => assignedClientIds.includes(user.id))
+        .map((user) => ({
+          label: user.email,
+          value: user.id,
+        }));
     });
+
     const router = useRouter();
     const rows = computed(() => store.projectData);
     const editProject = (info) => {

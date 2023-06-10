@@ -99,6 +99,7 @@ export default {
   setup(props) {
     const store = useAppStore();
     const router = useRouter();
+    const assignedProject = ref(null);
 
     const username = ref(null);
     const fullName = ref(null);
@@ -119,7 +120,6 @@ export default {
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
     ];
-
     if (props.mode === "edit" && props.id) {
       const user = store.usersData.find((user) => user.id === props.id);
       if (user) {
@@ -129,6 +129,18 @@ export default {
         companyName.value = user.companyName;
         role.value = user.role;
         allowLogin.value = user.allowLogin;
+
+        // Check if the user is assigned to any project
+        const assignedProjects = [];
+        store.projectData.forEach((project) => {
+          const clientIndex = project.clients.findIndex(
+            (client) => client.id === props.id
+          );
+          if (clientIndex !== -1) {
+            assignedProjects.push(project.projectName);
+          }
+        });
+        project.value = assignedProjects;
       }
     }
 
@@ -249,6 +261,8 @@ export default {
       fullName,
       email,
       companyName,
+      assignedProject,
+
       password,
       role,
       roles,

@@ -100,7 +100,7 @@
           />
           <q-tree
             :nodes="groups"
-            node-key="label"
+            node-key="id"
             selected-color="primary"
             v-model:selected="selected"
             v-model:ticked="ticked"
@@ -334,7 +334,7 @@ export default {
     };
 
     const editSelected = () => {
-      const group = groups.value.find((g) => g.label === selected.value);
+      const group = groups.value.find((g) => g.id === selected.value);
       if (group) {
         // The selected node is a group
         selectedGroupToEdit.value = selected.value;

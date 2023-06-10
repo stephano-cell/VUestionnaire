@@ -33,11 +33,11 @@
         </template>
         <template v-slot:body-cell-assigned_projects="props">
           <q-td :props="props">
-            <q-select
-              v-if="props.row.role == 'client'"
-              v-model="props.row.selected_project"
-              :options="props.row.project"
-            />
+            <div v-if="props.row.role == 'client'">
+              <div v-for="(project, index) in props.row.project" :key="index">
+                {{ project }}
+              </div>
+            </div>
             <span v-else>-</span>
           </q-td>
         </template>
@@ -54,7 +54,7 @@
 
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
-import { QSelect } from "quasar";
+
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 
@@ -127,14 +127,18 @@ export default {
 
     const usersData = computed(() => store.usersData);
     console.log(store.usersData);
-    const userRecords = usersData.value.map((row) => {
-      if (row.project && row.project.length > 0) {
-        return {
-          ...row,
-          selected_project: row.project[0], // Initialize with the first project in the array
-        };
-      }
-      return row;
+    const userRecords = usersData.value.map((user) => {
+      // Get the names of the projects that the user is assigned to
+      const assignedProjects = store.projectData
+        .filter((project) =>
+          project.clients.some((client) => client.id === user.id)
+        )
+        .map((project) => project.projectName);
+
+      return {
+        ...user,
+        project: assignedProjects,
+      };
     });
 
     store.installActions([
@@ -260,9 +264,6 @@ export default {
         }
       },
     };
-  },
-  components: {
-    QSelect,
   },
 };
 </script>

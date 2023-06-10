@@ -129,7 +129,6 @@ export default {
         companyName.value = user.companyName;
         role.value = user.role;
         allowLogin.value = user.allowLogin;
-        project.value = user.project;
       }
     }
 

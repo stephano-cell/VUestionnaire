@@ -391,7 +391,7 @@ export default {
       // Add a new group to the temporary data
       tempGroups.value.push({
         id: v4(), // Add a UUID to the group
-        label: `${groupName.value} (0)`, // Initialize the count to 0
+        label: groupName.value,
         children: [],
       });
       tempGroups.value.sort((a, b) => a.label.localeCompare(b.label)); // Sort groups alphabetically
@@ -411,7 +411,7 @@ export default {
         });
         group.children.sort((a, b) => a.label.localeCompare(b.label)); // Sort questions alphabetically
         // Update the group label to include the new count
-        group.label = `${group.label.split(" ")[0]} (${group.children.length})`;
+
         questionTitle.value = "";
         questionDescription.value = "";
         selectedGroup.value = "";
@@ -425,7 +425,7 @@ export default {
       );
 
       if (group) {
-        group.label = `${newGroupName.value} (${group.children.length})`;
+        group.label = newGroupName.value;
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
@@ -477,9 +477,6 @@ export default {
           if (index !== -1) {
             group.children.splice(index, 1);
             // Update the group label to include the new count
-            group.label = `${group.label.split(" ")[0]} (${
-              group.children.length
-            })`;
             selectedQuestionToDelete.value = "";
             showDeleteQuestionDialog.value = false;
           }

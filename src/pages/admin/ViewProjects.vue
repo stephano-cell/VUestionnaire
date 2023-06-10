@@ -294,7 +294,7 @@ export default {
     const computedGroups = computed(() => {
       return groups.value.map((group) => ({
         ...group,
-        label: `${group.label.split(" ")[0]} (${group.children.length})`,
+        label: `${group.label} (${group.children.length})`,
       }));
     });
 

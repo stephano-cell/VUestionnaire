@@ -42,12 +42,9 @@
 
         <template v-slot:body-cell-assigned_clients="props">
           <q-td :props="props">
-            <q-select
-              v-model="props.row.selected_clients"
-              :options="userOptions"
-              option-label="label"
-              option-value="value"
-            />
+            <div v-for="client in props.row.clients" :key="client.id">
+              {{ getUserEmail(client.id) }}
+            </div>
           </q-td>
         </template>
 
@@ -62,7 +59,7 @@
 </template>
 <script>
 import { ref, computed, nextTick, toRaw } from "vue";
-import { QSelect } from "quasar";
+
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
 
@@ -80,13 +77,6 @@ const columns = [
     name: "assigned_clients",
     label: "Assigned Clients",
     field: "clients",
-    format: (val) => {
-      if (val && val.length > 0) {
-        return `<q-select :options="${JSON.stringify(val)}" />`;
-      } else {
-        return "-";
-      }
-    },
   },
   {
     name: "comment",
@@ -146,6 +136,13 @@ export default {
     const pagination = ref({});
     const selected = ref([]);
     const store = useAppStore();
+    const getUserEmail = (userId) => {
+      const userOption = userOptions.value.find(
+        (option) => option.value === userId
+      );
+      return userOption ? userOption.label : "";
+    };
+
     const userOptions = computed(() => {
       // Get the IDs of all clients assigned to projects
       const assignedClientIds = store.projectData.flatMap((project) =>
@@ -183,6 +180,7 @@ export default {
     return {
       tableRef,
       store,
+      getUserEmail,
       router,
       navigationActive,
       filter: ref(""),
@@ -292,9 +290,6 @@ export default {
         }
       },
     };
-  },
-  components: {
-    QSelect,
   },
 };
 </script>

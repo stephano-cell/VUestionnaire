@@ -656,7 +656,7 @@ export default {
                 company: company.value,
                 comment: comment.value,
                 groups: copiedGroups,
-                clients: [],
+                clients: store.projectData[projectIndex].clients,
               };
 
               // Update the projects in local storage

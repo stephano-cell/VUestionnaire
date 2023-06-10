@@ -37,42 +37,6 @@
             v-model="comment"
             label="comment"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -113,15 +77,15 @@
 
       <template v-slot:after>
         <q-tab-panels
-          v-model="selected"
+          v-model="selectedNodeId"
           animated
           transition-prev="jump-up"
           transition-next="jump-up"
         >
           <q-tab-panel
             v-for="node in flattenedNodes"
-            :key="node.label"
-            :name="node.label"
+            :key="node.id"
+            :name="node.id"
           >
             <div class="text-h4 q-mb-md">{{ node.label }}</div>
             <p v-html="node.description"></p>
@@ -252,42 +216,6 @@
             v-model="questionDescription"
             label="Question Description"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -323,6 +251,12 @@ export default {
     const projectName = ref("");
     const company = ref("");
     const selected = ref("Food");
+    const selectedNodeId = computed(() => {
+      const node = flattenedNodes.value.find(
+        (node) => node.id === selected.value
+      );
+      return node ? node.id : null;
+    });
     const ticked = ref([]);
     const comment = ref("");
     const saveComment = () => {
@@ -337,12 +271,23 @@ export default {
       const group = groups.value.find((g) => g.id === selected.value);
       if (group) {
         // The selected node is a group
-        selectedGroupToEdit.value = selected.value;
+        selectedGroupToEdit.value = {
+          label: group.label,
+          value: group.id,
+        };
         showEditGroupDialog.value = true;
       } else {
         // The selected node is a question
-        selectedQuestionToEdit.value = selected.value;
-        showEditQuestionDialog.value = true;
+        const question = flattenedNodes.value.find(
+          (n) => n.id === selected.value
+        );
+        if (question) {
+          selectedQuestionToEdit.value = {
+            label: question.label,
+            value: question.id,
+          };
+          showEditQuestionDialog.value = true;
+        }
       }
     };
 
@@ -385,7 +330,7 @@ export default {
 
     const editQuestion = () => {
       if (
-        selectedQuestionToEdit.value.trim() === "" ||
+        selectedQuestionToEdit.value.label.trim() === "" ||
         newQuestionTitle.value.trim() === "" ||
         newQuestionDescription.value.trim() === ""
       ) {
@@ -393,12 +338,12 @@ export default {
       }
 
       const group = groups.value.find((g) =>
-        g.children.find((c) => c.label === selectedQuestionToEdit.value)
+        g.children.find((c) => c.label === selectedQuestionToEdit.value.label)
       );
 
       if (group) {
         const question = group.children.find(
-          (c) => c.label === selectedQuestionToEdit.value
+          (c) => c.label === selectedQuestionToEdit.value.label
         );
 
         if (question) {
@@ -428,17 +373,16 @@ export default {
       });
       return options;
     });
-
     const editGroup = () => {
       if (
-        selectedGroupToEdit.value.trim() === "" ||
+        selectedGroupToEdit.value.label.trim() === "" ||
         newGroupName.value.trim() === ""
       ) {
         return;
       }
 
       const group = groups.value.find(
-        (g) => g.label === selectedGroupToEdit.value
+        (g) => g.label === selectedGroupToEdit.value.label
       );
 
       if (group) {
@@ -714,6 +658,7 @@ export default {
     }
     return {
       splitterModel,
+      selectedNodeId,
       questionTitle,
       selectedGroup,
       selected,

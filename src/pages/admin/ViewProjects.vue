@@ -250,14 +250,15 @@ export default {
     const router = useRouter();
     const projectName = ref("");
     const company = ref("");
-    const selected = ref("Food");
+    const selected = ref("");
+    const ticked = ref("");
     const selectedNodeId = computed(() => {
       const node = flattenedNodes.value.find(
         (node) => node.id === selected.value
       );
       return node ? node.id : null;
     });
-    const ticked = ref([]);
+
     const comment = ref("");
     const saveComment = () => {
       // Save your comment here
@@ -299,20 +300,6 @@ export default {
     });
 
     const groups = ref([]);
-    onMounted(() => {
-      if (store.groupsData) {
-        groups.value = JSON.parse(JSON.stringify(store.groupsData)).map(
-          (group) => {
-            group.checked = ticked.value.includes(group.label) ? 1 : 0;
-            group.children = group.children.map((question) => {
-              question.checked = ticked.value.includes(question.label) ? 1 : 0;
-              return question;
-            });
-            return group;
-          }
-        );
-      }
-    });
 
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
@@ -349,9 +336,6 @@ export default {
         if (question) {
           question.label = newQuestionTitle.value;
           question.description = newQuestionDescription.value;
-          question.checked = ticked.value.includes(newQuestionTitle.value)
-            ? 1
-            : 0; // Add this line
 
           // Sort the questions alphabetically within the group.
           group.children.sort((a, b) => a.label.localeCompare(b.label));
@@ -387,7 +371,7 @@ export default {
 
       if (group) {
         group.label = newGroupName.value;
-        group.checked = ticked.value.includes(newGroupName.value) ? 1 : 0; // Add this line
+
         newGroupName.value = "";
         selectedGroupToEdit.value = "";
         showEditGroupDialog.value = false;
@@ -408,7 +392,6 @@ export default {
           id: v4(), // Assign a UUID to the new group
           label: groupName.value,
           children: [],
-          checked: ticked.value.includes(groupName.value) ? 1 : 0, // Add this line
         },
       ];
 
@@ -442,7 +425,6 @@ export default {
             id: v4(), // Assign a UUID to the new question
             label: questionTitle.value,
             description: questionDescription.value,
-            checked: ticked.value.includes(questionTitle.value) ? 1 : 0, // Add this line
           },
         ];
 
@@ -474,9 +456,7 @@ export default {
       if (store.groupsData) {
         groups.value = JSON.parse(JSON.stringify(store.groupsData)).map(
           (group) => {
-            group.checked = ticked.value.includes(group.label) ? 1 : 0;
             group.children = group.children.map((question) => {
-              question.checked = ticked.value.includes(question.label) ? 1 : 0;
               return question;
             });
             return group;
@@ -493,19 +473,6 @@ export default {
           company.value = project.company;
           comment.value = project.comment;
           groups.value = project.groups;
-
-          // Populate the ticked array with the labels of the groups and questions that are checked
-          ticked.value = [];
-          project.groups.forEach((group) => {
-            if (group.checked) {
-              ticked.value.push(group.label);
-            }
-            group.children.forEach((question) => {
-              if (question.checked) {
-                ticked.value.push(question.label);
-              }
-            });
-          });
         }
       }
     });
@@ -515,22 +482,6 @@ export default {
         {
           label: "CREATE PROJECT",
           callback: () => {
-            // Update the checked property of the groups and questions
-            groups.value = groups.value.map((group) => {
-              group.children = group.children.map((question) => {
-                question.checked = ticked.value.includes(question.label)
-                  ? 1
-                  : 0;
-                return question;
-              });
-              group.checked = group.children.some(
-                (question) => question.checked === 1
-              )
-                ? 1
-                : 0;
-              return group;
-            });
-
             // Create a deep copy of the groups
             const copiedGroups = JSON.parse(JSON.stringify(groups.value));
 
@@ -560,22 +511,6 @@ export default {
         {
           label: "Save",
           callback: () => {
-            // Update the checked property of the groups and questions
-            groups.value = groups.value.map((group) => {
-              group.children = group.children.map((question) => {
-                question.checked = ticked.value.includes(question.label)
-                  ? 1
-                  : 0;
-                return question;
-              });
-              group.checked = group.children.some(
-                (question) => question.checked === 1
-              )
-                ? 1
-                : 0;
-              return group;
-            });
-
             // Create a deep copy of the groups
             const copiedGroups = JSON.parse(JSON.stringify(groups.value));
 
@@ -614,22 +549,6 @@ export default {
         {
           label: "CLONE",
           callback: () => {
-            // Update the checked property of the groups and questions
-            groups.value = groups.value.map((group) => {
-              group.children = group.children.map((question) => {
-                question.checked = ticked.value.includes(question.label)
-                  ? 1
-                  : 0;
-                return question;
-              });
-              group.checked = group.children.some(
-                (question) => question.checked === 1
-              )
-                ? 1
-                : 0;
-              return group;
-            });
-
             // Create a deep copy of the groups
             const copiedGroups = JSON.parse(JSON.stringify(groups.value));
 
@@ -681,10 +600,10 @@ export default {
       selectedQuestionToEdit,
       newQuestionTitle,
       newQuestionDescription,
-
+      ticked,
       editQuestion,
       questionOptions,
-      ticked,
+
       editSelected,
       projectName,
       company,

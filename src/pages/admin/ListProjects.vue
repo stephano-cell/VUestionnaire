@@ -11,7 +11,6 @@
         :rows="rows"
         :columns="columns"
         row-key="name"
-        v-model:selected="selected"
         v-model:pagination="pagination"
         :filter="filter"
         @focusin="activateNavigation"
@@ -134,7 +133,7 @@ export default {
     const tableRef = ref(null);
     const navigationActive = ref(false);
     const pagination = ref({});
-    const selected = ref([]);
+
     const store = useAppStore();
     const getUserEmail = (userId) => {
       const userOption = userOptions.value.find(
@@ -184,7 +183,6 @@ export default {
       router,
       navigationActive,
       filter: ref(""),
-      selected,
       pagination,
       columns,
       userOptions,
@@ -285,8 +283,6 @@ export default {
             ];
             tableRef.value.$el.focus();
           });
-        } else {
-          selected.value = [computedRows[index]];
         }
       },
     };

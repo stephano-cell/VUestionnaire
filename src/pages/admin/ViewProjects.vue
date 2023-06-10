@@ -138,42 +138,6 @@
             label="New Question Description"
             class="q-mb-md"
             :dense="$q.screen.lt.md"
-            :toolbar="[
-              ['bold', 'italic', 'strike', 'underline'],
-
-              [
-                {
-                  label: $q.lang.editor.fontSize,
-                  icon: $q.iconSet.editor.fontSize,
-                  fixedLabel: true,
-                  fixedIcon: true,
-                  list: 'no-icons',
-                  options: [
-                    'size-1',
-                    'size-2',
-                    'size-3',
-                    'size-4',
-                    'size-5',
-                    'size-6',
-                    'size-7',
-                  ],
-                },
-              ],
-              [
-                {
-                  label: $q.lang.editor.align,
-                  icon: $q.iconSet.editor.align,
-                  fixedLabel: true,
-                  list: 'only-icons',
-                  options: ['left', 'center', 'right', 'justify'],
-                },
-                'unordered',
-                'ordered',
-              ],
-
-              ['undo', 'redo'],
-              ['fullscreen'],
-            ]"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -300,6 +264,22 @@ export default {
     });
 
     const groups = ref([]);
+    watch(
+      ticked,
+      () => {
+        const traverse = (node) => {
+          let isTicked = ticked.value.includes(node.id);
+          if (node.children) {
+            const areChildrenTicked = node.children.some(traverse);
+            isTicked = isTicked || areChildrenTicked;
+          }
+          node.ticked = isTicked;
+          return isTicked;
+        };
+        groups.value.forEach(traverse);
+      },
+      { deep: true }
+    );
 
     const showCreateGroupDialog = ref(false);
     const showCreateQuestionDialog = ref(false);
@@ -497,8 +477,15 @@ export default {
               id: v4(),
               projectName: projectName.value,
               company: company.value,
-              comment: comment.value, // Add this line
-              groups: copiedGroups,
+              comment: comment.value,
+              groups: copiedGroups.map((group) => ({
+                ...group,
+                ticked: group.ticked,
+                children: group.children.map((question) => ({
+                  ...question,
+                  ticked: question.ticked,
+                })),
+              })),
               clients: [],
             });
 
@@ -540,7 +527,19 @@ export default {
 
               // Update the projects in local storage
 
-              store.updateProjects(store.projectData);
+              store.updateProjects(
+                store.projectData.map((project) => ({
+                  ...project,
+                  groups: project.groups.map((group) => ({
+                    ...group,
+                    ticked: group.ticked,
+                    children: group.children.map((question) => ({
+                      ...question,
+                      ticked: question.ticked,
+                    })),
+                  })),
+                }))
+              );
 
               router.back();
             }
@@ -565,8 +564,15 @@ export default {
               id: v4(),
               projectName: projectName.value,
               company: company.value,
-              comment: comment.value, // Add this line
-              groups: copiedGroups,
+              comment: comment.value,
+              groups: copiedGroups.map((group) => ({
+                ...group,
+                ticked: group.ticked,
+                children: group.children.map((question) => ({
+                  ...question,
+                  ticked: question.ticked,
+                })),
+              })),
               clients: [],
             });
 

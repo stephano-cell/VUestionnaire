@@ -46,7 +46,7 @@
       </q-card>
     </q-dialog>
 
-    <q-splitter v-model="splitterModel" style="height: 500px">
+    <q-splitter v-model="splitterModel" style="height: 600px">
       <template v-slot:before>
         <div class="q-pa-md">
           <q-btn

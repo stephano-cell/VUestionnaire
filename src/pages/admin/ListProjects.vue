@@ -16,7 +16,6 @@
         @focusin="activateNavigation"
         @focusout="deactivateNavigation"
         @keydown="onKey"
-        @row-click="onRowClick"
         wrap-cells
       >
         <template v-slot:top-right>
@@ -46,7 +45,11 @@
             </div>
           </q-td>
         </template>
-
+        <template v-slot:body-cell-review="props">
+          <q-td :props="props">
+            <q-btn flat icon="preview" @click="reviewProject(props.row)" />
+          </q-td>
+        </template>
         <template v-slot:body-cell-edit="props">
           <q-td :props="props">
             <q-btn flat icon="edit" @click="editProject(props.row)" />
@@ -120,6 +123,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "review",
+    label: "",
+    align: "center",
+    field: () => "review",
+    sortable: false,
+  },
+  {
     name: "edit",
     label: "",
     align: "center",
@@ -159,12 +169,11 @@ export default {
 
     const router = useRouter();
     const rows = computed(() => store.projectData);
+    const reviewProject = (info) => {
+      router.push(`/admin/project/view/` + info.id);
+    };
     const editProject = (info) => {
       router.push(`/admin/project/edit/` + info.id);
-    };
-    const onRowClick = (evt, row) => {
-      console.log("Row clicked: ", row);
-      // Do something when a row is clicked
     };
 
     store.installActions([
@@ -188,7 +197,7 @@ export default {
       userOptions,
       rows,
       editProject,
-      onRowClick,
+      reviewProject,
 
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null

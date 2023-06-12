@@ -51,8 +51,11 @@ const routes = [
         }),
       },
       {
-        path: "project/review",
+        path: "project/review/:id",
         component: () => import("pages/admin/ReviewProject.vue"),
+        props: (route) => ({
+          id: route.params.id,
+        }),
       },
 
       {

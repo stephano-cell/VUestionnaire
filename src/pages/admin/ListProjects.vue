@@ -170,7 +170,7 @@ export default {
     const router = useRouter();
     const rows = computed(() => store.projectData);
     const reviewProject = (info) => {
-      router.push(`/admin/project/view/` + info.id);
+      router.push(`/admin/project/review/` + info.id);
     };
     const editProject = (info) => {
       router.push(`/admin/project/edit/` + info.id);

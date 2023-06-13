@@ -92,12 +92,6 @@
 
                   [
                     {
-                      label: $q.lang.editor.formatting,
-                      icon: $q.iconSet.editor.formatting,
-                      list: 'no-icons',
-                      options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-                    },
-                    {
                       label: $q.lang.editor.fontSize,
                       icon: $q.iconSet.editor.fontSize,
                       fixedLabel: true,
@@ -113,24 +107,6 @@
                         'size-7',
                       ],
                     },
-                    {
-                      label: $q.lang.editor.defaultFont,
-                      icon: $q.iconSet.editor.font,
-                      fixedIcon: true,
-                      list: 'no-icons',
-                      options: [
-                        'default_font',
-                        'arial',
-                        'arial_black',
-                        'comic_sans',
-                        'courier_new',
-                        'impact',
-                        'lucida_grande',
-                        'times_new_roman',
-                        'verdana',
-                      ],
-                    },
-                    'removeFormat',
                   ],
                   [
                     {
@@ -147,16 +123,6 @@
                   ['undo', 'redo'],
                   ['fullscreen'],
                 ]"
-                :fonts="{
-                  arial: 'Arial',
-                  arial_black: 'Arial Black',
-                  comic_sans: 'Comic Sans MS',
-                  courier_new: 'Courier New',
-                  impact: 'Impact',
-                  lucida_grande: 'Lucida Grande',
-                  times_new_roman: 'Times New Roman',
-                  verdana: 'Verdana',
-                }"
               />
               <q-select
                 v-model="selectedReviewerResponse"
@@ -200,7 +166,10 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useAppStore } from "../../stores/appStore";
+import { useRouter } from "vue-router";
+import { v4 } from "uuid";
 
 export default {
   setup() {
@@ -208,8 +177,20 @@ export default {
     const selected = ref(null);
     const clientResponse = ref("");
     const reviewerResponse = ref("");
+    const appStore = useAppStore();
+    const router = useRouter();
+    const projectId = router.currentRoute.value.params.id;
+    const projectData = appStore.projectData.find(
+      (project) => project.id === projectId
+    );
+    if (!projectData) {
+      throw new Error("Data not found refresh");
+    }
+    const projectName = ref(projectData.projectName);
+
     const isLocked = ref(false);
     const isComplete = ref(false);
+
     const clientResponses = ref([
       {
         name: "Client 1",
@@ -247,42 +228,33 @@ export default {
       reviewerResponses.value[reviewerResponses.value.length - 1]
     );
 
-    const groups = ref([
-      {
-        label: "Group 1",
-        children: [
-          {
-            label: "Question 1",
-            description: "Description for Question 1",
-          },
-          {
-            label: "Question 2",
-            description: "Description for Question 2",
-          },
-        ],
-      },
-      {
-        label: "Group 2",
-        children: [
-          {
-            label: "Question 3",
-            description: "Description for Question 3",
-          },
-        ],
-      },
-    ]);
+    const groups = computed(() => {
+      // Filter out the groups that are not ticked
+      const tickedGroups = projectData.groups.filter((group) => group.ticked);
+
+      // For each ticked group, filter out the questions that are not ticked
+      tickedGroups.forEach((group) => {
+        group.children = group.children.filter((question) => question.ticked);
+      });
+      return tickedGroups;
+    });
 
     const flattenedNodes = computed(() => {
       const nodes = [];
       const traverse = (node) => {
         if (node.children) {
+          node.children = node.children.filter((child) => child.ticked);
           node.children.forEach(traverse);
         }
-        if (node.description) {
+        if (node.description && node.ticked) {
           nodes.push(node);
         }
       };
-      groups.value.forEach(traverse);
+      groups.value.forEach((group) => {
+        if (group.ticked) {
+          traverse(group);
+        }
+      });
       return nodes;
     });
 
@@ -325,7 +297,6 @@ export default {
       reviewerResponse.value = selectedReviewerResponse.value.response;
     });
 
-    const projectName = ref("Test 1");
     const totalQuestions = ref(300);
     const clientToAnswer = ref(150);
     const adminToReview = ref(50);

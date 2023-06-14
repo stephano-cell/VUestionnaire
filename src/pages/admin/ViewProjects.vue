@@ -453,9 +453,27 @@ export default {
           company.value = project.company;
           comment.value = project.comment;
           groups.value = project.groups;
+
+          // Set the ticked value to the ticked groups of the project
+          ticked.value = getTickedGroups(project.groups);
         }
       }
     });
+
+    // Helper function to get the ticked groups from a project
+    function getTickedGroups(groups) {
+      const tickedGroups = [];
+      const traverse = (node) => {
+        if (node.ticked) {
+          tickedGroups.push(node.id);
+        }
+        if (node.children) {
+          node.children.forEach(traverse);
+        }
+      };
+      groups.forEach(traverse);
+      return tickedGroups;
+    }
 
     if (props.mode === "new") {
       store.installActions([

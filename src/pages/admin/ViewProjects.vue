@@ -372,6 +372,7 @@ export default {
           id: v4(), // Assign a UUID to the new group
           label: groupName.value,
           children: [],
+          ticked: false, // Set ticked to false
         },
       ];
 
@@ -405,6 +406,7 @@ export default {
             id: v4(), // Assign a UUID to the new question
             label: questionTitle.value,
             description: questionDescription.value,
+            ticked: false,
           },
         ];
 

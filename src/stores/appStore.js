@@ -26,6 +26,21 @@ export const useAppStore = defineStore("appStore", {
   },
   actions: {
     // ------------------------------------- Api calls
+    getUserByID(id) {
+      const user = this.usersData.find((u) => u.id === id);
+      if (!user) {
+        return null;
+      } else {
+        // Check if the user is assigned to any project
+        user.assignedProjects = [];
+        this.projectData.forEach((project) => {
+          const userIndex = project.clients.findIndex((c) => c.id === id);
+          if (userIndex !== -1) user.assignedProjects.push(project.projectName);
+        });
+        return user;
+      }
+    },
+
     insertNewUser(newUser) {
       this.usersData.push(newUser);
       LocalStorage.set("users", this.usersData); // set auth to local storage

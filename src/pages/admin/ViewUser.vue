@@ -120,30 +120,6 @@ export default {
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
     ];
-    if (props.mode === "edit" && props.id) {
-      const user = store.usersData.find((user) => user.id === props.id);
-      if (user) {
-        username.value = user.username;
-        fullName.value = user.fullName;
-        email.value = user.email;
-        companyName.value = user.companyName;
-        role.value = user.role;
-        allowLogin.value = user.allowLogin;
-
-        // Check if the user is assigned to any project
-        const assignedProjects = [];
-        store.projectData.forEach((project) => {
-          const clientIndex = project.clients.findIndex(
-            (client) => client.id === props.id
-          );
-          if (clientIndex !== -1) {
-            assignedProjects.push(project.projectName);
-          }
-        });
-        project.value = assignedProjects;
-      }
-    }
-
     if (props.mode === "new") {
       store.installActions([
         {
@@ -186,6 +162,18 @@ export default {
         },
       ]);
     } else if (props.mode === "edit") {
+      if (!props.id) return alert("No user ID provided");
+
+      const user = store.getUserByID(props.id);
+      if (!user) return alert("User ID not found");
+
+      user.value = user.username;
+      fullName.value = user.fullName;
+      email.value = user.email;
+      companyName.value = user.companyName;
+      role.value = user.role;
+      allowLogin.value = user.allowLogin;
+      project.value = user.assignedProjects;
       store.installActions([
         {
           label: "Save",
@@ -254,6 +242,8 @@ export default {
           },
         },
       ]);
+    } else {
+      return alert("Invalid mode");
     }
 
     return {

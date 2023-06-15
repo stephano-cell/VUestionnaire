@@ -17,7 +17,6 @@
         @focusin="activateNavigation"
         @focusout="deactivateNavigation"
         @keydown="onKey"
-        @row-click="onRowClick"
         wrap-cells
       >
         <template v-slot:top-right>
@@ -32,6 +31,12 @@
               <q-icon name="search" />
             </template>
           </q-input>
+        </template>
+
+        <template v-slot:body-cell-answerProject="props">
+          <q-td :props="props">
+            <q-btn flat icon="preview" @click="answerProject" />
+          </q-td>
         </template>
       </q-table>
     </div>
@@ -74,6 +79,13 @@ const columns = [
     field: "status",
     sortable: true,
   },
+  {
+    name: "answerProject",
+    label: "",
+    align: "center",
+    field: () => "answerProject",
+    sortable: false,
+  },
 ];
 
 const rowsData = [
@@ -109,21 +121,18 @@ export default {
     const navigationActive = ref(false);
     const pagination = ref({});
     const selected = ref([]);
-
-    const onRowClick = (evt, row) => {
-      console.log("Row clicked: ", row);
-      // Do something when a row is clicked
-    };
+    const answerProject = ref();
+    // Your implementation here
 
     return {
       tableRef,
       navigationActive,
       filter: ref(""),
       selected,
+      answerProject,
       pagination,
       columns,
       rows: ref(rowsData),
-      onRowClick,
 
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null

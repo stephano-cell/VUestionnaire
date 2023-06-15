@@ -100,7 +100,6 @@ export default {
     const store = useAppStore();
     const router = useRouter();
     const assignedProject = ref(null);
-
     const username = ref(null);
     const fullName = ref(null);
     const email = ref(null);
@@ -109,13 +108,11 @@ export default {
     const role = ref(null);
     const allowLogin = ref(false);
     const project = ref([]);
-
     const sortedProjects = computed(() => {
       return [...store.projectData].sort((a, b) =>
         a.projectName.localeCompare(b.projectName)
       );
     });
-
     const roles = [
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
@@ -126,47 +123,28 @@ export default {
           label: "Insert",
           callback: () => {
             const userId = v4(); // Generate a UUID for the new user
-
             // Insert the new user
-            store.insertNewUser({
-              id: userId,
-              username: username.value,
-              fullName: fullName.value,
-              email: email.value,
-              companyName: companyName.value,
-              password: password.value,
-
-              role: role.value,
-              allowLogin: allowLogin.value,
-            });
-
-            // If the new user is a client, add the user to the clients array of the selected projects
-            if (role.value === "client") {
-              project.value.forEach((projectName) => {
-                const project = store.projectData.find(
-                  (p) => p.projectName === projectName
-                );
-                if (project) {
-                  project.clients.push({
-                    id: userId,
-                  });
-                }
-              });
-              // Update the projects in local storage
-              store.updateProjects(store.projectData);
-              store.updateUsers(store.usersData);
-            }
-
+            store.insertNewUser(
+              {
+                id: userId,
+                username: username.value,
+                fullName: fullName.value,
+                email: email.value,
+                companyName: companyName.value,
+                password: password.value,
+                role: role.value,
+                allowLogin: allowLogin.value,
+              },
+              project.value
+            );
             router.back();
           },
         },
       ]);
     } else if (props.mode === "edit") {
       if (!props.id) return alert("No user ID provided");
-
       const user = store.getUserByID(props.id);
       if (!user) return alert("User ID not found");
-
       user.value = user.username;
       fullName.value = user.fullName;
       email.value = user.email;
@@ -178,11 +156,6 @@ export default {
         {
           label: "Save",
           callback: () => {
-            // Get the original user
-            const originalUser = store.usersData.find(
-              (user) => user.id === props.id
-            );
-
             const updatedUser = {
               id: props.id,
               username: username.value,
@@ -193,52 +166,9 @@ export default {
               role: role.value,
               allowLogin: allowLogin.value,
             };
-            const userIndex = store.usersData.findIndex(
-              (user) => user.id === props.id
-            );
-            if (userIndex !== -1) {
-              store.usersData[userIndex] = updatedUser;
-
-              // If the updated user is a client, update the clients array of the selected projects
-              if (role.value === "client") {
-                // First, remove the user from the clients array of all projects
-                store.projectData.forEach((project) => {
-                  const clientIndex = project.clients.findIndex(
-                    (client) => client.id === props.id
-                  );
-                  if (clientIndex !== -1) {
-                    project.clients.splice(clientIndex, 1);
-                  }
-                });
-                // Then, add the user to the clients array of the selected projects
-                project.value.forEach((projectName) => {
-                  const project = store.projectData.find(
-                    (p) => p.projectName === projectName
-                  );
-                  if (project) {
-                    project.clients.push({ id: props.id });
-                  }
-                });
-              }
-
-              // If the user's role has changed from 'client' to 'admin', remove the user from the clients array of all projects
-              if (originalUser.role === "client" && role.value === "admin") {
-                store.projectData.forEach((project) => {
-                  const clientIndex = project.clients.findIndex(
-                    (client) => client.id === props.id
-                  );
-                  if (clientIndex !== -1) {
-                    project.clients.splice(clientIndex, 1);
-                  }
-                });
-              }
-
-              // Update the projects and users in the store
-              store.updateProjects(store.projectData);
-              store.updateUsers(store.usersData);
-
-              router.back();
-            }
+            // Update the user
+            store.updateUser(props.id, updatedUser, project.value);
+            router.back();
           },
         },
       ]);
@@ -252,7 +182,6 @@ export default {
       email,
       companyName,
       assignedProject,
-
       password,
       role,
       roles,

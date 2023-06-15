@@ -41,18 +41,79 @@ export const useAppStore = defineStore("appStore", {
       }
     },
 
-    insertNewUser(newUser) {
-      this.usersData.push(newUser);
-      LocalStorage.set("users", this.usersData); // set auth to local storage
-    },
-    updateProjects(projects) {
-      this.projectData = projects;
-      LocalStorage.set("projects", this.projectData);
-    },
+    insertNewUser(user, projects) {
+      this.usersData.push(user);
+      LocalStorage.set("users", this.usersData); // set users to local storage
 
+      // If the new user is a client, add the user to the clients array of the selected projects
+      if (user.role === "client") {
+        projects.forEach((projectName) => {
+          const project = this.projectData.find(
+            (p) => p.projectName === projectName
+          );
+          if (project) {
+            project.clients.push({
+              id: user.id,
+            });
+          }
+        });
+        // Update the projects in local storage
+        this.updateProjects(this.projectData);
+      }
+    },
     updateUsers(users) {
       this.usersData = users;
       LocalStorage.set("users", this.usersData);
+    },
+    updateUser(userId, updatedUser, projects) {
+      const userIndex = this.usersData.findIndex((user) => user.id === userId);
+      if (userIndex !== -1) {
+        const originalUser = this.usersData[userIndex];
+        this.usersData[userIndex] = updatedUser;
+
+        // If the updated user is a client, update the clients array of the selected projects
+        if (updatedUser.role === "client") {
+          // First, remove the user from the clients array of all projects
+          this.projectData.forEach((project) => {
+            const clientIndex = project.clients.findIndex(
+              (client) => client.id === userId
+            );
+            if (clientIndex !== -1) {
+              project.clients.splice(clientIndex, 1);
+            }
+          });
+          // Then, add the user to the clients array of the selected projects
+          projects.forEach((projectName) => {
+            const project = this.projectData.find(
+              (p) => p.projectName === projectName
+            );
+            if (project) {
+              project.clients.push({ id: userId });
+            }
+          });
+        }
+
+        // If the user's role has changed from 'client' to 'admin', remove the user from the clients array of all projects
+        if (originalUser.role === "client" && updatedUser.role === "admin") {
+          this.projectData.forEach((project) => {
+            const clientIndex = project.clients.findIndex(
+              (client) => client.id === userId
+            );
+            if (clientIndex !== -1) {
+              project.clients.splice(clientIndex, 1);
+            }
+          });
+        }
+
+        // Update the projects and users in the store
+        this.updateProjects(this.projectData);
+        this.updateUsers(this.usersData);
+      }
+    },
+
+    updateProjects(projects) {
+      this.projectData = projects;
+      LocalStorage.set("projects", this.projectData);
     },
 
     insertNewProject(newProject) {

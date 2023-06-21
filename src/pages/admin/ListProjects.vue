@@ -41,7 +41,7 @@
         <template v-slot:body-cell-assigned_clients="props">
           <q-td :props="props">
             <div v-for="client in props.row.clients" :key="client.id">
-              {{ getUserEmail(client.id) }}
+              {{ store.getUserEmail(client.id) }}
             </div>
           </q-td>
         </template>
@@ -145,27 +145,6 @@ export default {
     const pagination = ref({});
 
     const store = useAppStore();
-    const getUserEmail = (userId) => {
-      const userOption = userOptions.value.find(
-        (option) => option.value === userId
-      );
-      return userOption ? userOption.label : "";
-    };
-
-    const userOptions = computed(() => {
-      // Get the IDs of all clients assigned to projects
-      const assignedClientIds = store.projectData.flatMap((project) =>
-        project.clients.map((client) => client.id)
-      );
-
-      // Filter the users to only include those whose IDs are in the list of assigned client IDs
-      return store.usersData
-        .filter((user) => assignedClientIds.includes(user.id))
-        .map((user) => ({
-          label: user.email,
-          value: user.id,
-        }));
-    });
 
     const router = useRouter();
     const rows = computed(() => store.projectData);
@@ -188,13 +167,13 @@ export default {
     return {
       tableRef,
       store,
-      getUserEmail,
+
       router,
       navigationActive,
       filter: ref(""),
       pagination,
       columns,
-      userOptions,
+
       rows,
       editProject,
       reviewProject,

@@ -23,6 +23,23 @@ export const useAppStore = defineStore("appStore", {
       console.log("Authenticated: " + (this.auth != null ? "yes" : "no"));
       return this.auth;
     },
+    getUserEmail: (state) => (userId) => {
+      const userOption = state.userOptions.find(
+        (option) => option.value === userId
+      );
+      return userOption ? userOption.label : "";
+    },
+    userOptions(state) {
+      const assignedClientIds = state.projectData.flatMap((project) =>
+        project.clients.map((client) => client.id)
+      );
+      return state.usersData
+        .filter((user) => assignedClientIds.includes(user.id))
+        .map((user) => ({
+          label: user.email,
+          value: user.id,
+        }));
+    },
   },
   actions: {
     // ------------------------------------- Api calls

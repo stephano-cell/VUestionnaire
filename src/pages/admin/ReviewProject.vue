@@ -229,15 +229,16 @@ export default {
     );
 
     // Compute the groups and flattenedNodes properties
+    // Compute the groups and flattenedNodes properties
     const groups = computed(() => {
-      const filteredGroups = projectData.groups.filter((group) => {
-        const hasTickedQuestions = group.children.some(
+      const filteredGroups = projectData.groups.map((group) => {
+        const filteredQuestions = group.children.filter(
           (question) => question.ticked
         );
-        return hasTickedQuestions;
+        return { ...group, children: filteredQuestions };
       });
 
-      return filteredGroups;
+      return filteredGroups.filter((group) => group.children.length > 0);
     });
 
     const flattenedNodes = computed(() => {

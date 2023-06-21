@@ -133,6 +133,24 @@ export const useAppStore = defineStore("appStore", {
       this.groupsData = groups;
       LocalStorage.set("groups", this.groupsData); // set groups to local storage
     },
+    //map Users Below
+    mapUserRecords() {
+      const usersData = this.usersData;
+      const projectData = this.projectData;
+
+      return usersData.map((user) => {
+        const assignedProjects = projectData
+          .filter((project) =>
+            project.clients.some((client) => client.id === user.id)
+          )
+          .map((project) => project.projectName);
+
+        return {
+          ...user,
+          project: assignedProjects,
+        };
+      });
+    },
     authenticate(username, pass) {
       //TODO: Replace with API call /api/login/
       {

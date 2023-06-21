@@ -125,21 +125,7 @@ export default {
       router.push(`/admin/user/edit/` + info.id);
     };
 
-    const usersData = computed(() => store.usersData);
-    console.log(store.usersData);
-    const userRecords = usersData.value.map((user) => {
-      // Get the names of the projects that the user is assigned to
-      const assignedProjects = store.projectData
-        .filter((project) =>
-          project.clients.some((client) => client.id === user.id)
-        )
-        .map((project) => project.projectName);
-
-      return {
-        ...user,
-        project: assignedProjects,
-      };
-    });
+    const userRecords = computed(() => store.mapUserRecords());
 
     store.installActions([
       {

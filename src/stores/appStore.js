@@ -43,6 +43,7 @@ export const useAppStore = defineStore("appStore", {
   },
   actions: {
     // ------------------------------------- Api calls
+    //ViewUser
     getUserByID(id) {
       const user = this.usersData.find((u) => u.id === id);
       if (!user) {
@@ -57,7 +58,7 @@ export const useAppStore = defineStore("appStore", {
         return user;
       }
     },
-
+    //ViewUser
     insertNewUser(user, projects) {
       this.usersData.push(user);
       LocalStorage.set("users", this.usersData); // set users to local storage
@@ -78,6 +79,7 @@ export const useAppStore = defineStore("appStore", {
         this.updateProjects(this.projectData);
       }
     },
+    //ViewUser.vue
     updateUsers(users) {
       this.usersData = users;
       LocalStorage.set("users", this.usersData);
@@ -127,30 +129,19 @@ export const useAppStore = defineStore("appStore", {
         this.updateUsers(this.usersData);
       }
     },
-
+    //ViewProjects.vue
     updateProjects(projects) {
       this.projectData = projects;
       LocalStorage.set("projects", this.projectData);
     },
-
     insertNewProject(newProject) {
       this.projectData.push(newProject);
       LocalStorage.set("projects", this.projectData); // set projects to local storage
     },
-    deleteAllUsers() {
-      this.usersData = [];
-      LocalStorage.set("users", this.usersData); // set auth to local storage
+    //ListUsers.vue
+    editUser(router, info) {
+      router.push(`/admin/user/edit/${info.id}`);
     },
-    logout() {
-      console.log("Logout");
-      this.auth = null;
-      LocalStorage.remove("auth"); // remove auth from local storage
-    },
-    saveGroups(groups) {
-      this.groupsData = groups;
-      LocalStorage.set("groups", this.groupsData); // set groups to local storage
-    },
-    //map Users Below
     mapUserRecords() {
       const usersData = this.usersData;
       const projectData = this.projectData;
@@ -168,7 +159,11 @@ export const useAppStore = defineStore("appStore", {
         };
       });
     },
-    // ...
+    deleteAllUsers() {
+      this.usersData = [];
+      LocalStorage.set("users", this.usersData); // set auth to local storage
+    },
+    // ... ListProjects.vue
     reviewProject(router, info) {
       router.push(`/admin/project/review/${info.id}`);
     },
@@ -177,8 +172,14 @@ export const useAppStore = defineStore("appStore", {
       router.push(`/admin/project/edit/${info.id}`);
     },
 
-    editUser(router, info) {
-      router.push(`/admin/user/edit/${info.id}`);
+    logout() {
+      console.log("Logout");
+      this.auth = null;
+      LocalStorage.remove("auth"); // remove auth from local storage
+    },
+    saveGroups(groups) {
+      this.groupsData = groups;
+      LocalStorage.set("groups", this.groupsData); // set groups to local storage
     },
 
     // ...

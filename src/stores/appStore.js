@@ -23,6 +23,7 @@ export const useAppStore = defineStore("appStore", {
       console.log("Authenticated: " + (this.auth != null ? "yes" : "no"));
       return this.auth;
     },
+    //ListProjects.vue
     getUserEmail: (state) => (userId) => {
       const userOption = state.userOptions.find(
         (option) => option.value === userId

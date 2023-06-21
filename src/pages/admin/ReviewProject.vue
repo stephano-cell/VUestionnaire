@@ -228,36 +228,38 @@ export default {
       reviewerResponses.value[reviewerResponses.value.length - 1]
     );
 
+    // Compute the groups and flattenedNodes properties
     const groups = computed(() => {
-      // For each group, filter out the questions that are not ticked
-      projectData.groups.forEach((group) => {
-        group.children = group.children.filter((question) => question.ticked);
+      const filteredGroups = projectData.groups.filter((group) => {
+        const hasTickedQuestions = group.children.some(
+          (question) => question.ticked
+        );
+        return hasTickedQuestions;
       });
 
-      // Filter out the groups that have no ticked questions
-      const tickedGroups = projectData.groups.filter(
-        (group) => group.children.length > 0
-      );
-
-      return tickedGroups;
+      return filteredGroups;
     });
 
     const flattenedNodes = computed(() => {
       const nodes = [];
+
       const traverse = (node) => {
         if (node.children) {
-          node.children = node.children.filter((child) => child.ticked);
-          node.children.forEach(traverse);
+          const filteredChildren = node.children.filter(
+            (child) => child.ticked
+          );
+          filteredChildren.forEach(traverse);
         }
+
         if (node.description && node.ticked) {
           nodes.push(node);
         }
       };
+
       groups.value.forEach((group) => {
-        if (group.ticked) {
-          traverse(group);
-        }
+        traverse(group);
       });
+
       return nodes;
     });
 

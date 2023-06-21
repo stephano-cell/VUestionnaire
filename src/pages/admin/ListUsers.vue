@@ -121,9 +121,6 @@ export default {
     const selected = ref([]);
     const store = useAppStore();
     const router = useRouter();
-    const editUser = (info) => {
-      router.push(`/admin/user/edit/` + info.id);
-    };
 
     const userRecords = computed(() => store.mapUserRecords());
 
@@ -143,7 +140,9 @@ export default {
     ]);
 
     return {
-      editUser,
+      editUser(info) {
+        store.editUser(router, info);
+      },
       tableRef,
       navigationActive,
       filter: ref(""),

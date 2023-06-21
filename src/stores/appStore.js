@@ -176,6 +176,11 @@ export const useAppStore = defineStore("appStore", {
     editProject(router, info) {
       router.push(`/admin/project/edit/${info.id}`);
     },
+
+    editUser(router, info) {
+      router.push(`/admin/user/edit/${info.id}`);
+    },
+
     // ...
 
     authenticate(username, pass) {

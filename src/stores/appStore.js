@@ -168,6 +168,16 @@ export const useAppStore = defineStore("appStore", {
         };
       });
     },
+    // ...
+    reviewProject(router, info) {
+      router.push(`/admin/project/review/${info.id}`);
+    },
+
+    editProject(router, info) {
+      router.push(`/admin/project/edit/${info.id}`);
+    },
+    // ...
+
     authenticate(username, pass) {
       //TODO: Replace with API call /api/login/
       {

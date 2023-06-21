@@ -143,17 +143,9 @@ export default {
     const tableRef = ref(null);
     const navigationActive = ref(false);
     const pagination = ref({});
-
     const store = useAppStore();
-
     const router = useRouter();
     const rows = computed(() => store.projectData);
-    const reviewProject = (info) => {
-      router.push(`/admin/project/review/` + info.id);
-    };
-    const editProject = (info) => {
-      router.push(`/admin/project/edit/` + info.id);
-    };
 
     store.installActions([
       {
@@ -173,23 +165,22 @@ export default {
       filter: ref(""),
       pagination,
       columns,
-
       rows,
-      editProject,
-      reviewProject,
-
+      reviewProject(info) {
+        store.reviewProject(router, info);
+      },
+      editProject(info) {
+        store.editProject(router, info);
+      },
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null
       ),
-
       activateNavigation() {
         navigationActive.value = true;
       },
-
       deactivateNavigation() {
         navigationActive.value = false;
       },
-
       onKey(evt) {
         if (
           navigationActive.value !== true ||

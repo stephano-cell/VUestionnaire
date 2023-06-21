@@ -268,13 +268,11 @@ export default {
       ticked,
       () => {
         const traverse = (node) => {
-          let isTicked = ticked.value.includes(node.id);
           if (node.children) {
-            const areChildrenTicked = node.children.some(traverse);
-            isTicked = isTicked || areChildrenTicked;
+            node.children.forEach((child) => {
+              child.ticked = ticked.value.includes(child.id);
+            });
           }
-          node.ticked = isTicked;
-          return isTicked;
         };
         groups.value.forEach(traverse);
       },
@@ -372,7 +370,6 @@ export default {
           id: v4(), // Assign a UUID to the new group
           label: groupName.value,
           children: [],
-          ticked: false, // Set ticked to false
         },
       ];
 
@@ -456,25 +453,27 @@ export default {
           comment.value = project.comment;
           groups.value = project.groups;
 
-          // Set the ticked value to the ticked groups of the project
-          ticked.value = getTickedGroups(project.groups);
+          // Set the ticked value to the ticked questions of the project
+          ticked.value = getTickedQuestions(project.groups);
         }
       }
     });
 
     // Helper function to get the ticked groups from a project
-    function getTickedGroups(groups) {
-      const tickedGroups = [];
+    // Helper function to get the ticked groups from a project
+    function getTickedQuestions(groups) {
+      const tickedQuestions = [];
       const traverse = (node) => {
-        if (node.ticked) {
-          tickedGroups.push(node.id);
-        }
         if (node.children) {
-          node.children.forEach(traverse);
+          node.children.forEach((child) => {
+            if (child.ticked) {
+              tickedQuestions.push(child.id);
+            }
+          });
         }
       };
       groups.forEach(traverse);
-      return tickedGroups;
+      return tickedQuestions;
     }
 
     if (props.mode === "new") {
@@ -500,7 +499,6 @@ export default {
               comment: comment.value,
               groups: copiedGroups.map((group) => ({
                 ...group,
-                ticked: group.ticked,
                 children: group.children.map((question) => ({
                   ...question,
                   ticked: question.ticked,
@@ -508,7 +506,6 @@ export default {
               })),
               clients: [],
             });
-
             router.back();
           },
         },
@@ -552,7 +549,6 @@ export default {
                   ...project,
                   groups: project.groups.map((group) => ({
                     ...group,
-                    ticked: group.ticked,
                     children: group.children.map((question) => ({
                       ...question,
                       ticked: question.ticked,
@@ -587,7 +583,6 @@ export default {
               comment: comment.value,
               groups: copiedGroups.map((group) => ({
                 ...group,
-                ticked: group.ticked,
                 children: group.children.map((question) => ({
                   ...question,
                   ticked: question.ticked,

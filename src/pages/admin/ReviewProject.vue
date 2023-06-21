@@ -229,13 +229,16 @@ export default {
     );
 
     const groups = computed(() => {
-      // Filter out the groups that are not ticked
-      const tickedGroups = projectData.groups.filter((group) => group.ticked);
-
-      // For each ticked group, filter out the questions that are not ticked
-      tickedGroups.forEach((group) => {
+      // For each group, filter out the questions that are not ticked
+      projectData.groups.forEach((group) => {
         group.children = group.children.filter((question) => question.ticked);
       });
+
+      // Filter out the groups that have no ticked questions
+      const tickedGroups = projectData.groups.filter(
+        (group) => group.children.length > 0
+      );
+
       return tickedGroups;
     });
 

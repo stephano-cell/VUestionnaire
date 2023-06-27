@@ -37,6 +37,42 @@
             v-model="comment"
             label="comment"
             :dense="$q.screen.lt.md"
+            :toolbar="[
+              ['bold', 'italic', 'strike', 'underline'],
+
+              [
+                {
+                  label: $q.lang.editor.fontSize,
+                  icon: $q.iconSet.editor.fontSize,
+                  fixedLabel: true,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'size-1',
+                    'size-2',
+                    'size-3',
+                    'size-4',
+                    'size-5',
+                    'size-6',
+                    'size-7',
+                  ],
+                },
+              ],
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  list: 'only-icons',
+                  options: ['left', 'center', 'right', 'justify'],
+                },
+                'unordered',
+                'ordered',
+              ],
+
+              ['undo', 'redo'],
+              ['fullscreen'],
+            ]"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -138,6 +174,42 @@
             label="New Question Description"
             class="q-mb-md"
             :dense="$q.screen.lt.md"
+            :toolbar="[
+              ['bold', 'italic', 'strike', 'underline'],
+
+              [
+                {
+                  label: $q.lang.editor.fontSize,
+                  icon: $q.iconSet.editor.fontSize,
+                  fixedLabel: true,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'size-1',
+                    'size-2',
+                    'size-3',
+                    'size-4',
+                    'size-5',
+                    'size-6',
+                    'size-7',
+                  ],
+                },
+              ],
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  list: 'only-icons',
+                  options: ['left', 'center', 'right', 'justify'],
+                },
+                'unordered',
+                'ordered',
+              ],
+
+              ['undo', 'redo'],
+              ['fullscreen'],
+            ]"
           />
         </q-card-section>
         <q-card-actions align="right">
@@ -180,6 +252,42 @@
             v-model="questionDescription"
             label="Question Description"
             :dense="$q.screen.lt.md"
+            :toolbar="[
+              ['bold', 'italic', 'strike', 'underline'],
+
+              [
+                {
+                  label: $q.lang.editor.fontSize,
+                  icon: $q.iconSet.editor.fontSize,
+                  fixedLabel: true,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'size-1',
+                    'size-2',
+                    'size-3',
+                    'size-4',
+                    'size-5',
+                    'size-6',
+                    'size-7',
+                  ],
+                },
+              ],
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  list: 'only-icons',
+                  options: ['left', 'center', 'right', 'justify'],
+                },
+                'unordered',
+                'ordered',
+              ],
+
+              ['undo', 'redo'],
+              ['fullscreen'],
+            ]"
           />
         </q-card-section>
         <q-card-actions align="right">

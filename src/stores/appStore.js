@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { LocalStorage } from "quasar";
+const axios = require("axios");
 // This stores the state of the entire app, specific features use their own stores
 export const useAppStore = defineStore("appStore", {
   state: () => ({
@@ -61,75 +62,122 @@ export const useAppStore = defineStore("appStore", {
     },
     //ViewUser
     insertNewUser(user, projects) {
-      this.usersData.push(user);
-      LocalStorage.set("users", this.usersData); // set users to local storage
+      // Send a POST request to the /register route of the backend
+      axios
+        .post("http://localhost:3000/register", {
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+          companyName: user.companyName,
+          password: user.password,
+          role: user.role,
+          allowLogin: user.allowLogin,
+          projectUUIDs: projects.join(","),
+        })
+        .then((response) => {
+          console.log("User created with ID:", response.data.id);
 
-      // If the new user is a client, add the user to the clients array of the selected projects
-      if (user.role === "client") {
-        projects.forEach((projectName) => {
-          const project = this.projectData.find(
-            (p) => p.projectName === projectName
-          );
-          if (project) {
-            project.clients.push({
-              id: user.id,
+          // If the new user is a client, add the user to the clients array of the selected projects
+          if (user.role === "client") {
+            projects.forEach((projectName) => {
+              const project = this.projectData.find(
+                (p) => p.projectName === projectName
+              );
+              if (project) {
+                project.clients.push({
+                  id: response.data.id,
+                });
+              }
             });
+            // Update the projects in local storage
+            this.updateProjects(this.projectData);
           }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
         });
-        // Update the projects in local storage
-        this.updateProjects(this.projectData);
-      }
     },
+
     //ViewUser.vue
     updateUsers(users) {
       this.usersData = users;
       LocalStorage.set("users", this.usersData);
     },
     updateUser(userId, updatedUser, projects) {
-      const userIndex = this.usersData.findIndex((user) => user.id === userId);
-      if (userIndex !== -1) {
-        const originalUser = this.usersData[userIndex];
-        this.usersData[userIndex] = updatedUser;
+      // Send a PUT request to the /users/:id route of the backend
+      axios
+        .put(`http://localhost:3000/users/${userId}`, {
+          username: updatedUser.username,
+          fullName: updatedUser.fullName,
+          email: updatedUser.email,
+          companyName: updatedUser.companyName,
+          password: updatedUser.password,
+          role: updatedUser.role,
+          allowLogin: updatedUser.allowLogin,
+          projectUUIDs: projects.join(","),
+        })
+        .then((response) => {
+          console.log("User updated with ID:", response.data.id);
 
-        // If the updated user is a client, update the clients array of the selected projects
-        if (updatedUser.role === "client") {
-          // First, remove the user from the clients array of all projects
-          this.projectData.forEach((project) => {
-            const clientIndex = project.clients.findIndex(
-              (client) => client.id === userId
-            );
-            if (clientIndex !== -1) {
-              project.clients.splice(clientIndex, 1);
-            }
-          });
-          // Then, add the user to the clients array of the selected projects
-          projects.forEach((projectName) => {
-            const project = this.projectData.find(
-              (p) => p.projectName === projectName
-            );
-            if (project) {
-              project.clients.push({ id: userId });
-            }
-          });
-        }
+          // If the updated user is a client, update the clients array of the selected projects
+          if (updatedUser.role === "client") {
+            // First, remove the user from the clients array of all projects
+            this.projectData.forEach((project) => {
+              const clientIndex = project.clients.findIndex(
+                (client) => client.id === userId
+              );
+              if (clientIndex !== -1) {
+                project.clients.splice(clientIndex, 1);
+              }
+            });
+            // Then, add the user to the clients array of the selected projects
+            projects.forEach((projectName) => {
+              const project = this.projectData.find(
+                (p) => p.projectName === projectName
+              );
+              if (project) {
+                project.clients.push({ id: userId });
+              }
+            });
+          }
 
-        // If the user's role has changed from 'client' to 'admin', remove the user from the clients array of all projects
-        if (originalUser.role === "client" && updatedUser.role === "admin") {
-          this.projectData.forEach((project) => {
-            const clientIndex = project.clients.findIndex(
-              (client) => client.id === userId
-            );
-            if (clientIndex !== -1) {
-              project.clients.splice(clientIndex, 1);
-            }
-          });
-        }
+          // If the user's role has changed from 'client' to 'admin', remove the user from the clients array of all projects
+          if (originalUser.role === "client" && updatedUser.role === "admin") {
+            this.projectData.forEach((project) => {
+              const clientIndex = project.clients.findIndex(
+                (client) => client.id === userId
+              );
+              if (clientIndex !== -1) {
+                project.clients.splice(clientIndex, 1);
+              }
+            });
+          }
 
-        // Update the projects and users in the store
-        this.updateProjects(this.projectData);
-        this.updateUsers(this.usersData);
-      }
+          // Fetch the updated list of users from the backend
+          axios
+            .get("http://localhost:3000/users")
+            .then((response) => {
+              this.usersData = response.data;
+            })
+            .catch((error) => {
+              console.error("Error fetching users:", error);
+            });
+
+          // Fetch the updated list of projects from the backend
+          axios
+            .get("http://localhost:3000/projects")
+            .then((response) => {
+              this.projectData = response.data;
+            })
+            .catch((error) => {
+              console.error("Error fetching projects:", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
+
     //ViewProjects.vue
     updateProjects(projects) {
       this.projectData = projects;

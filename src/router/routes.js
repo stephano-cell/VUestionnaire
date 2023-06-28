@@ -1,3 +1,5 @@
+import { useAppStore } from "../stores/appStore"; // adjust the path as needed
+
 const routes = [
   {
     path: "",
@@ -10,6 +12,16 @@ const routes = [
   {
     path: "/admin",
     component: () => import("layouts/AdminLayout.vue"),
+    beforeEnter: (to, from, next) => {
+      // Check if the user is authenticated and is an admin
+      const store = useAppStore();
+      if (store.authenticated && store.auth.type === "admin") {
+        next();
+      } else {
+        // Redirect to the login page if the user is not an admin
+        next("/login");
+      }
+    },
     children: [
       { path: "", component: () => import("pages/admin/IndexPage.vue") },
       {
@@ -65,8 +77,18 @@ const routes = [
     ],
   },
   {
-    path: "/session/",
+    path: "/session",
     component: () => import("layouts/ClientLayout.vue"),
+    beforeEnter: (to, from, next) => {
+      // Check if the user is authenticated and is a client
+      const store = useAppStore();
+      if (store.authenticated && store.auth.type === "client") {
+        next();
+      } else {
+        // Redirect to the login page if the user is not a client
+        next("/login");
+      }
+    },
     children: [
       {
         path: "",

@@ -22,6 +22,7 @@
 import { ref, toRefs } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "../stores/appStore";
+
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -34,23 +35,29 @@ export default defineComponent({
   setup(props) {
     const { redirect } = toRefs(props);
     const username = ref("admin");
-    const password = ref("pass");
+    const password = ref("admin");
     const router = useRouter();
     const store = useAppStore();
 
     const login = () => {
       // Call authenticate with the value properties of username and password
-      const auth = store.authenticate(username.value, password.value);
-      if (auth) {
-        var dest = redirect?.value;
-        if (dest == "/") dest = null;
-        console.log("Redirect to " + dest);
-        if (auth?.type == "admin") {
-          router.replace(dest ?? "/admin/");
-        } else if (auth?.type == "client") {
-          router.replace(dest ?? "/session/");
+      store.authenticate(username.value, password.value).then(() => {
+        // Check if the user is authenticated
+        if (store.auth) {
+          var dest = redirect?.value;
+          if (dest == "/") dest = null;
+          console.log("Redirect to " + dest);
+
+          // Redirect based on the user's role
+          if (store.auth.type == "admin") {
+            router.replace(dest ?? "/admin/");
+          } else if (store.auth.type == "client") {
+            router.replace(dest ?? "/session/");
+          }
+        } else {
+          console.error("Failed to authenticate");
         }
-      }
+      });
     };
 
     return {

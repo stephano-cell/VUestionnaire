@@ -247,22 +247,31 @@ export const useAppStore = defineStore("appStore", {
     // ...
 
     authenticate(username, pass) {
-      //TODO: Replace with API call /api/login/
-      {
-        if (username == "admin" && pass == "pass") {
-          this.auth = { type: "admin", token: "testAdmin" };
-          LocalStorage.set("auth", this.auth); // set auth to local storage
-        } else if (username == "client" && pass == "pass") {
-          this.auth = { type: "client", token: "testClient" };
-          LocalStorage.set("auth", this.auth); // set auth to local storage
-        } else {
+      // Send a POST request to your server's login route
+      return axios
+        .post("http://localhost:3000/login", {
+          username: username,
+          password: pass,
+        })
+        .then((response) => {
+          // The server should return the user's data if the login is successful
+          const user = response.data;
+
+          // Store the user's data in the auth state
+          this.auth = {
+            type: user.role, // This should be either 'admin' or 'client'
+            token: user.token, // The server should generate a token for the session
+          };
+
+          // Store the auth state in local storage
+          LocalStorage.set("auth", this.auth);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
           this.auth = null;
-        }
-      }
-      //TODO: End
-      console.log("Login as: " + JSON.stringify(this.auth));
-      return this.auth;
+        });
     },
+
     // ------------------------------------- For app
     installActions(actions) {
       this.dynamicActions = actions ?? [];

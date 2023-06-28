@@ -124,6 +124,30 @@ app.put("/users/:id", (req, res) => {
     }
   );
 });
+// Login route
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  // Fetch the user data from the database
+  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    // If the user doesn't exist or the password is incorrect, return a 401 Unauthorized status
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // If the login is successful, generate a token for the session
+    const token = jwt.sign({ id: user.id }, "your_jwt_secret", {
+      expiresIn: "1h",
+    });
+
+    // Return the user's data and the token
+    return res.status(200).json({ ...user, token });
+  });
+});
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);

@@ -88,6 +88,43 @@ app.get("/users", (req, res) => {
   });
 });
 
+// Update user route
+app.put("/users/:id", (req, res) => {
+  const {
+    username,
+    fullName,
+    email,
+    companyName,
+    password,
+    role,
+    allowLogin,
+    projectUUIDs,
+  } = req.body;
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  db.run(
+    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = ?, role = ?, allowLogin = ?, projectUUIDs = ? WHERE id = ?`,
+    [
+      username,
+      fullName,
+      email,
+      companyName,
+      hashedPassword,
+      role,
+      allowLogin,
+      projectUUIDs,
+      req.params.id,
+    ],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json({ id: req.params.id });
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });

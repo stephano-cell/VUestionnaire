@@ -6,10 +6,11 @@ export const useAppStore = defineStore("appStore", {
   state: () => ({
     dynamicActions: [], // special: this has no storage, each page sets its actions
     auth: LocalStorage.getItem("auth") || null, // get auth from local storage
-    usersData: LocalStorage.getItem("users") || [], // get users from local storage
+    usersData: [], // initialize as empty array
     groupsData: LocalStorage.getItem("groups") || [], // get groups from local storage
     projectData: LocalStorage.getItem("projects") || [], // get projects from local storage
   }),
+
   getters: {
     getActions() {
       var id = 1;
@@ -20,6 +21,7 @@ export const useAppStore = defineStore("appStore", {
         }) ?? [];
       return actions;
     },
+
     authenticated() {
       console.log("Authenticated: " + (this.auth != null ? "yes" : "no"));
       return this.auth;
@@ -59,6 +61,16 @@ export const useAppStore = defineStore("appStore", {
         });
         return user;
       }
+    },
+    fetchUsers() {
+      axios
+        .get("http://localhost:3000/users")
+        .then((response) => {
+          this.usersData = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching users:", error);
+        });
     },
     //ViewUser
     insertNewUser(user, projects) {
@@ -191,6 +203,7 @@ export const useAppStore = defineStore("appStore", {
     editUser(router, info) {
       router.push(`/admin/user/edit/${info.id}`);
     },
+
     mapUserRecords() {
       const usersData = this.usersData;
       const projectData = this.projectData;

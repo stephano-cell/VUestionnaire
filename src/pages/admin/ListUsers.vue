@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { ref, computed, nextTick, toRaw } from "vue";
+import { ref, computed, nextTick, toRaw, onMounted } from "vue";
 
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
@@ -121,6 +121,10 @@ export default {
     const selected = ref([]);
     const store = useAppStore();
     const router = useRouter();
+
+    onMounted(() => {
+      store.fetchUsers();
+    });
 
     const userRecords = computed(() => store.mapUserRecords());
 

@@ -78,6 +78,16 @@ app.post("/register", (req, res) => {
   );
 });
 
+// Get all users
+app.get("/users", (req, res) => {
+  db.all(`SELECT * FROM users`, [], (err, rows) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    return res.status(200).json(rows);
+  });
+});
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });

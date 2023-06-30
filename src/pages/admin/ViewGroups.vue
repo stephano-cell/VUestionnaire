@@ -292,7 +292,8 @@ export default {
     const tempGroups = ref([]); // Temporary copy of groups
 
     // Load groups from the store when the component is mounted
-    onMounted(() => {
+    onMounted(async () => {
+      await store.fetchGroups();
       const storedGroups = store.groupsData;
       if (storedGroups) {
         groups.value = storedGroups;
@@ -337,9 +338,15 @@ export default {
     const questionDescription = ref("");
     const selectedGroup = ref("");
 
-    watch(selectedGroup, (newValue) => {
-      console.log("selectedGroup value:", newValue);
-    });
+    watch(
+      () => store.groupsData,
+      (newGroupsData) => {
+        groups.value = newGroupsData;
+        tempGroups.value = JSON.parse(JSON.stringify(newGroupsData)); // Make a deep copy of groups
+      },
+      { immediate: true } // Run the watcher immediately when the component is created
+    );
+
     const showEditGroupDialog = ref(false);
     const selectedGroupToEdit = ref("");
     const newGroupName = ref("");
@@ -483,14 +490,32 @@ export default {
         }
       });
     };
-
     store.installActions([
       {
         label: "Save",
         callback: () => {
           // Copy the temporary data back to groups and save it to the store
           groups.value = JSON.parse(JSON.stringify(tempGroups.value));
-          store.saveGroups(groups.value);
+
+          // Save all groups to the database
+          groups.value.forEach((group) => {
+            // If the group is new (i.e., it doesn't exist in the store), create it
+            if (!store.groupsData.find((g) => g.id === group.id)) {
+              store.createGroup(group);
+            }
+            // Otherwise, update it
+            else {
+              store.updateGroup(group.id, group);
+            }
+          });
+
+          // Delete all groups in the store that don't exist in groups.value
+          store.groupsData.forEach((group) => {
+            if (!groups.value.find((g) => g.id === group.id)) {
+              store.deleteGroup(group.id);
+            }
+          });
+
           router.back();
         },
       },
@@ -525,6 +550,7 @@ export default {
       showDeleteQuestionDialog,
       selectedQuestionToDelete,
       deleteGroup,
+
       deleteQuestion,
       editSelected,
       selectedNodeId,

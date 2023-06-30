@@ -148,6 +148,77 @@ app.post("/login", (req, res) => {
     return res.status(200).json({ ...user, token });
   });
 });
+// Create the groups table
+db.run(
+  `CREATE TABLE IF NOT EXISTS groups(
+  id TEXT PRIMARY KEY,
+  label TEXT,
+  children TEXT
+)`,
+  (err) => {
+    if (err) {
+      return console.log(err.message);
+    }
+    console.log("Groups table created");
+  }
+);
+
+// Create a new group
+app.post("/groups", (req, res) => {
+  const { id, label, children } = req.body;
+  db.run(
+    `INSERT INTO groups(id, label, children) VALUES(?, ?, ?)`,
+    [id, label, JSON.stringify(children)],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(201).json({ id: this.lastID });
+    }
+  );
+});
+// Get all groups
+// Get all groups
+app.get("/groups", (req, res) => {
+  db.all(`SELECT * FROM groups`, [], (err, rows) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    // Parse the 'children' column from string to JSON
+    const groups = rows.map((row) => ({
+      ...row,
+      children: JSON.parse(row.children),
+    }));
+
+    return res.status(200).json(groups);
+  });
+});
+
+// Update a group
+app.put("/groups/:id", (req, res) => {
+  const { label, children } = req.body;
+  db.run(
+    `UPDATE groups SET label = ?, children = ? WHERE id = ?`,
+    [label, JSON.stringify(children), req.params.id],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json({ id: req.params.id });
+    }
+  );
+});
+
+// Delete a group
+app.delete("/groups/:id", (req, res) => {
+  db.run(`DELETE FROM groups WHERE id = ?`, req.params.id, function (err) {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    return res.status(200).json({ id: req.params.id });
+  });
+});
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);

@@ -6,9 +6,10 @@ export const useAppStore = defineStore("appStore", {
   state: () => ({
     dynamicActions: [], // special: this has no storage, each page sets its actions
     auth: LocalStorage.getItem("auth") || null, // get auth from local storage
-    usersData: [], // initialize as empty array
-    groupsData: LocalStorage.getItem("groups") || [], // get groups from local storage
-    projectData: LocalStorage.getItem("projects") || [], // get projects from local storage
+    usersData: [],
+    groupsData: [],
+    questionsData: [],
+    projectData: [],
   }),
 
   getters: {
@@ -72,6 +73,7 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error fetching users:", error);
         });
     },
+
     //ViewUser
     insertNewUser(user, projects) {
       // Send a POST request to the /register route of the backend
@@ -109,7 +111,79 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error:", error);
         });
     },
+    //ViewGroups
+    fetchGroups() {
+      axios
+        .get("http://localhost:3000/groups")
+        .then((response) => {
+          this.groupsData = response.data.map((group) => {
+            return {
+              ...group,
+              children: JSON.parse(group.children),
+            };
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching groups:", error);
+        });
+    },
 
+    saveGroups(groups) {
+      axios
+        .post("http://localhost:3000/groups", {
+          ...groups,
+          children: JSON.stringify(groups.children),
+        })
+        .then((response) => {
+          this.groupsData = response.data;
+        })
+        .catch((error) => {
+          console.error("Error saving groups:", error);
+        });
+    },
+    createGroup(group) {
+      axios
+        .post("http://localhost:3000/groups", {
+          ...group,
+          children: JSON.stringify(group.children),
+        })
+        .then((response) => {
+          this.groupsData.push(response.data);
+        })
+        .catch((error) => {
+          console.error("Error creating group:", error);
+        });
+    },
+    updateGroup(id, group) {
+      axios
+        .put(`http://localhost:3000/groups/${id}`, {
+          ...group,
+          children: JSON.stringify(group.children),
+        })
+        .then((response) => {
+          const index = this.groupsData.findIndex((g) => g.id === id);
+          if (index !== -1) {
+            this.groupsData.splice(index, 1, response.data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating group:", error);
+        });
+    },
+
+    deleteGroup(id) {
+      axios
+        .delete(`http://localhost:3000/groups/${id}`)
+        .then(() => {
+          const index = this.groupsData.findIndex((g) => g.id === id);
+          if (index !== -1) {
+            this.groupsData.splice(index, 1);
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting group:", error);
+        });
+    },
     //ViewUser.vue
     updateUsers(users) {
       this.usersData = users;
@@ -238,10 +312,6 @@ export const useAppStore = defineStore("appStore", {
       console.log("Logout");
       this.auth = null;
       LocalStorage.remove("auth"); // remove auth from local storage
-    },
-    saveGroups(groups) {
-      this.groupsData = groups;
-      LocalStorage.set("groups", this.groupsData); // set groups to local storage
     },
 
     // ...

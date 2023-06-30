@@ -185,10 +185,7 @@ export const useAppStore = defineStore("appStore", {
         });
     },
     //ViewUser.vue
-    updateUsers(users) {
-      this.usersData = users;
-      LocalStorage.set("users", this.usersData);
-    },
+
     updateUser(userId, updatedUser, projects) {
       // Send a PUT request to the /users/:id route of the backend
       axios
@@ -320,10 +317,7 @@ export const useAppStore = defineStore("appStore", {
         };
       });
     },
-    deleteAllUsers() {
-      this.usersData = [];
-      LocalStorage.set("users", this.usersData); // set auth to local storage
-    },
+
     // ... ListProjects.vue
     reviewProject(router, info) {
       router.push(`/admin/project/review/${info.id}`);

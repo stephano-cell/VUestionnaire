@@ -135,12 +135,6 @@ export default {
           router.push("/admin/user/new");
         },
       },
-      {
-        label: "Delete all",
-        callback: () => {
-          store.deleteAllUsers();
-        },
-      },
     ]);
 
     return {

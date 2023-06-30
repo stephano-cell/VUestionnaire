@@ -60,7 +60,7 @@
   </q-page>
 </template>
 <script>
-import { ref, computed, nextTick, toRaw } from "vue";
+import { ref, computed, nextTick, toRaw, onMounted } from "vue";
 
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
@@ -145,7 +145,7 @@ export default {
     const pagination = ref({});
     const store = useAppStore();
     const router = useRouter();
-    const rows = computed(() => store.projectData);
+    const rows = ref([]);
 
     store.installActions([
       {
@@ -155,6 +155,10 @@ export default {
         },
       },
     ]);
+    onMounted(async () => {
+      await store.fetchProjects(); // Fetch projects when the component is mounted
+      rows.value = store.projectData; // Assign the fetched projects to the rows computed property
+    });
 
     return {
       tableRef,

@@ -220,6 +220,90 @@ app.delete("/groups/:id", (req, res) => {
   });
 });
 
+//Projects
+
+// Create the projects table
+db.run(
+  `CREATE TABLE IF NOT EXISTS projects (
+    id TEXT PRIMARY KEY,
+    projectName TEXT,
+    company TEXT,
+    comment TEXT,
+    groups TEXT,
+    clients TEXT
+  )`,
+  (err) => {
+    if (err) {
+      return console.log(err.message);
+    }
+    console.log("Projects table created");
+  }
+);
+
+// Create a new project
+app.post("/projects", (req, res) => {
+  const { projectName, company, comment, groups, clients } = req.body;
+
+  db.run(
+    `INSERT INTO projects(id, projectName, company, comment, groups, clients) VALUES(?, ?, ?, ?, ?, ?)`,
+    [
+      uuidv4(),
+      projectName,
+      company,
+      comment,
+      JSON.stringify(groups),
+      JSON.stringify(clients),
+    ],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(201).json({ id: this.lastID });
+    }
+  );
+});
+
+// Get all projects
+app.get("/projects", (req, res) => {
+  db.all(`SELECT * FROM projects`, [], (err, rows) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    // Parse the 'groups' and 'clients' columns from string to JSON
+    const projects = rows.map((row) => ({
+      ...row,
+      groups: JSON.parse(row.groups),
+      clients: JSON.parse(row.clients),
+    }));
+
+    return res.status(200).json(projects);
+  });
+});
+
+// Update a project
+app.put("/projects/:id", (req, res) => {
+  const { projectName, company, comment, groups, clients } = req.body;
+
+  db.run(
+    `UPDATE projects SET projectName = ?, company = ?, comment = ?, groups = ?, clients = ? WHERE id = ?`,
+    [
+      projectName,
+      company,
+      comment,
+      JSON.stringify(groups),
+      JSON.stringify(clients),
+      req.params.id,
+    ],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json({ id: req.params.id });
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });

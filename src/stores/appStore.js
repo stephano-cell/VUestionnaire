@@ -265,13 +265,38 @@ export const useAppStore = defineStore("appStore", {
     },
 
     //ViewProjects.vue
+    fetchProjects() {
+      axios
+        .get("http://localhost:3000/projects")
+        .then((response) => {
+          console.log("Projects fetched:", response.data);
+          this.projectData = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching projects:", error);
+        });
+    },
     updateProjects(projects) {
-      this.projectData = projects;
-      LocalStorage.set("projects", this.projectData);
+      axios
+        .put(`http://localhost:3000/projects`, projects)
+        .then((response) => {
+          console.log("Projects updated:", response.data);
+          this.projectData = response.data;
+        })
+        .catch((error) => {
+          console.error("Error updating projects:", error);
+        });
     },
     insertNewProject(newProject) {
-      this.projectData.push(newProject);
-      LocalStorage.set("projects", this.projectData); // set projects to local storage
+      axios
+        .post("http://localhost:3000/projects", newProject)
+        .then((response) => {
+          console.log("Project created with ID:", response.data.id);
+          this.projectData.push(response.data);
+        })
+        .catch((error) => {
+          console.error("Error creating project:", error);
+        });
     },
     //ListUsers.vue
     editUser(router, info) {

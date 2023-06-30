@@ -8,7 +8,6 @@ export const useAppStore = defineStore("appStore", {
     auth: LocalStorage.getItem("auth") || null, // get auth from local storage
     usersData: [],
     groupsData: [],
-    questionsData: [],
     projectData: [],
   }),
 

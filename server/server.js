@@ -31,7 +31,7 @@ db.run(
   password TEXT,
   role TEXT,
   allowLogin INTEGER,
-  projectUUIDs TEXT
+  projects TEXT
 )`,
   (err) => {
     if (err) {
@@ -51,13 +51,13 @@ app.post("/register", (req, res) => {
     password,
     role,
     allowLogin,
-    projectUUIDs,
+    projects,
   } = req.body;
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   db.run(
-    `INSERT INTO users(id, username, fullName, email, companyName, password, role, allowLogin, projectUUIDs) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO users(id, username, fullName, email, companyName, password, role, allowLogin, projects) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       uuidv4(),
       username,
@@ -67,7 +67,7 @@ app.post("/register", (req, res) => {
       hashedPassword,
       role,
       allowLogin,
-      projectUUIDs,
+      projects,
     ],
     function (err) {
       if (err) {
@@ -98,13 +98,13 @@ app.put("/users/:id", (req, res) => {
     password,
     role,
     allowLogin,
-    projectUUIDs,
+    projects,
   } = req.body;
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   db.run(
-    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = ?, role = ?, allowLogin = ?, projectUUIDs = ? WHERE id = ?`,
+    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = ?, role = ?, allowLogin = ?, projects = ? WHERE id = ?`,
     [
       username,
       fullName,
@@ -113,7 +113,7 @@ app.put("/users/:id", (req, res) => {
       hashedPassword,
       role,
       allowLogin,
-      projectUUIDs,
+      projects,
       req.params.id,
     ],
     function (err) {

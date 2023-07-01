@@ -85,7 +85,7 @@ export const useAppStore = defineStore("appStore", {
           password: user.password,
           role: user.role,
           allowLogin: user.allowLogin,
-          projectUUIDs: projects.join(","),
+          projects: projects.join(","),
         })
         .then((response) => {
           console.log("User created with ID:", response.data.id);
@@ -100,10 +100,10 @@ export const useAppStore = defineStore("appStore", {
                 project.clients.push({
                   id: response.data.id,
                 });
+                // Update the project in the database
+                this.updateProject(project);
               }
             });
-            // Update the projects in local storage
-            this.updateProjects(this.projectData);
           }
         })
         .catch((error) => {
@@ -184,8 +184,9 @@ export const useAppStore = defineStore("appStore", {
         });
     },
     //ViewUser.vue
-
     updateUser(userId, updatedUser, projects) {
+      // Fetch the original user data before updating it
+      const originalUser = this.usersData.find((user) => user.id === userId);
       // Send a PUT request to the /users/:id route of the backend
       axios
         .put(`http://localhost:3000/users/${userId}`, {
@@ -196,7 +197,7 @@ export const useAppStore = defineStore("appStore", {
           password: updatedUser.password,
           role: updatedUser.role,
           allowLogin: updatedUser.allowLogin,
-          projectUUIDs: projects.join(","),
+          projects: projects.join(","),
         })
         .then((response) => {
           console.log("User updated with ID:", response.data.id);
@@ -210,6 +211,8 @@ export const useAppStore = defineStore("appStore", {
               );
               if (clientIndex !== -1) {
                 project.clients.splice(clientIndex, 1);
+                // Update the project in the database
+                this.updateProject(project);
               }
             });
             // Then, add the user to the clients array of the selected projects
@@ -219,6 +222,8 @@ export const useAppStore = defineStore("appStore", {
               );
               if (project) {
                 project.clients.push({ id: userId });
+                // Update the project in the database
+                this.updateProject(project);
               }
             });
           }
@@ -231,6 +236,8 @@ export const useAppStore = defineStore("appStore", {
               );
               if (clientIndex !== -1) {
                 project.clients.splice(clientIndex, 1);
+                // Update the project in the database
+                this.updateProject(project);
               }
             });
           }
@@ -259,7 +266,6 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error:", error);
         });
     },
-
     //ViewProjects.vue
     fetchProjects() {
       axios
@@ -323,8 +329,10 @@ export const useAppStore = defineStore("appStore", {
 
       return usersData.map((user) => {
         const assignedProjects = projectData
-          .filter((project) =>
-            project.clients.some((client) => client.id === user.id)
+          .filter(
+            (project) =>
+              project.clients &&
+              project.clients.some((client) => client.id === user.id)
           )
           .map((project) => project.projectName);
 

@@ -543,20 +543,9 @@ export default {
                 clients: store.projectData[projectIndex].clients,
               };
 
-              // Update the projects in local storage
+              // Update the project in the database
 
-              store.updateProjects(
-                store.projectData.map((project) => ({
-                  ...project,
-                  groups: project.groups.map((group) => ({
-                    ...group,
-                    children: group.children.map((question) => ({
-                      ...question,
-                      ticked: question.ticked,
-                    })),
-                  })),
-                }))
-              );
+              store.updateProject(store.projectData[projectIndex]);
 
               router.back();
             }

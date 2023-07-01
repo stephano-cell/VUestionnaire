@@ -283,6 +283,24 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error updating projects:", error);
         });
     },
+    updateProject(updatedProject) {
+      axios
+        .put(
+          `http://localhost:3000/projects/${updatedProject.id}`,
+          updatedProject
+        )
+        .then((response) => {
+          const index = this.projectData.findIndex(
+            (project) => project.id === updatedProject.id
+          );
+          if (index !== -1) {
+            this.projectData[index] = response.data;
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating project:", error);
+        });
+    },
     insertNewProject(newProject) {
       axios
         .post("http://localhost:3000/projects", newProject)

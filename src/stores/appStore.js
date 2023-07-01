@@ -98,7 +98,7 @@ export const useAppStore = defineStore("appStore", {
               );
               if (project) {
                 project.clients.push({
-                  id: response.data.id,
+                  id: response.data.id, // Use the ID from the response
                 });
                 // Update the project in the database
                 this.updateProject(project);
@@ -110,6 +110,7 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error:", error);
         });
     },
+
     //ViewGroups
     fetchGroups() {
       return axios

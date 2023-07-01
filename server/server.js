@@ -42,6 +42,7 @@ db.run(
 );
 
 // Register route
+// Register route
 app.post("/register", (req, res) => {
   const {
     username,
@@ -55,11 +56,11 @@ app.post("/register", (req, res) => {
   } = req.body;
 
   const hashedPassword = bcrypt.hashSync(password, 10);
-
+  const userId = uuidv4();
   db.run(
     `INSERT INTO users(id, username, fullName, email, companyName, password, role, allowLogin, projects) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      uuidv4(),
+      userId,
       username,
       fullName,
       email,
@@ -73,7 +74,7 @@ app.post("/register", (req, res) => {
       if (err) {
         return res.status(400).json({ error: err.message });
       }
-      return res.status(201).json({ id: this.lastID });
+      return res.status(201).json({ id: userId }); // Send the UUID back to the client
     }
   );
 });

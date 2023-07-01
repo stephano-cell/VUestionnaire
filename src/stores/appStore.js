@@ -112,7 +112,7 @@ export const useAppStore = defineStore("appStore", {
     },
     //ViewGroups
     fetchGroups() {
-      axios
+      return axios
         .get("http://localhost:3000/groups")
         .then((response) => {
           this.groupsData = response.data.map((group) => {

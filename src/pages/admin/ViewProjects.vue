@@ -614,7 +614,6 @@ export default {
       ticked,
       editQuestion,
       questionOptions,
-
       editSelected,
       projectName,
       company,

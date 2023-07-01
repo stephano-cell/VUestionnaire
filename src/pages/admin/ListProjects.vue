@@ -60,7 +60,7 @@
   </q-page>
 </template>
 <script>
-import { ref, computed, nextTick, toRaw, onMounted } from "vue";
+import { ref, computed, nextTick, toRaw, onMounted, watch } from "vue";
 
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
@@ -159,6 +159,13 @@ export default {
       await store.fetchProjects(); // Fetch projects when the component is mounted
       rows.value = store.projectData; // Assign the fetched projects to the rows computed property
     });
+    watch(
+      () => store.projectData,
+      (newProjectData) => {
+        rows.value = newProjectData;
+      },
+      { immediate: true }
+    );
 
     return {
       tableRef,

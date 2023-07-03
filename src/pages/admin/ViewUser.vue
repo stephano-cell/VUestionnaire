@@ -163,10 +163,13 @@ export default {
               fullName: fullName.value,
               email: email.value,
               companyName: companyName.value,
-              password: password.value,
               role: role.value,
               allowLogin: allowLogin.value,
             };
+            // If the password field is not empty, update the password
+            if (password.value) {
+              updatedUser.password = password.value;
+            }
             // Update the user
             store.updateUser(props.id, updatedUser, project.value);
             router.back();

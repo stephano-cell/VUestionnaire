@@ -102,10 +102,13 @@ app.put("/users/:id", (req, res) => {
     projects,
   } = req.body;
 
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  let hashedPassword = null;
+  if (password) {
+    hashedPassword = bcrypt.hashSync(password, 10);
+  }
 
   db.run(
-    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = ?, role = ?, allowLogin = ?, projects = ? WHERE id = ?`,
+    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = COALESCE(?, password), role = ?, allowLogin = ?, projects = ? WHERE id = ?`,
     [
       username,
       fullName,
@@ -125,6 +128,7 @@ app.put("/users/:id", (req, res) => {
     }
   );
 });
+
 // Login route
 app.post("/login", (req, res) => {
   const { username, password } = req.body;

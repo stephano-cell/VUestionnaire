@@ -145,7 +145,8 @@ export default {
       if (!props.id) return alert("No user ID provided");
       const user = store.getUserByID(props.id);
       if (!user) return alert("User ID not found");
-      user.value = user.username;
+      username.value = user.username;
+
       fullName.value = user.fullName;
       email.value = user.email;
       companyName.value = user.companyName;

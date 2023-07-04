@@ -21,7 +21,15 @@ export const useAppStore = defineStore("appStore", {
         }) ?? [];
       return actions;
     },
-
+    userProjects(state) {
+      if (!state.auth) {
+        return [];
+      }
+      const userId = state.auth.id;
+      return state.projectData.filter((project) =>
+        project.clients.some((client) => client.id === userId)
+      );
+    },
     authenticated() {
       console.log("Authenticated: " + (this.auth != null ? "yes" : "no"));
       return this.auth;
@@ -62,6 +70,7 @@ export const useAppStore = defineStore("appStore", {
         return user;
       }
     },
+
     fetchUsers() {
       axios
         .get("http://localhost:3000/users")
@@ -279,6 +288,9 @@ export const useAppStore = defineStore("appStore", {
           console.error("Error fetching projects:", error);
         });
     },
+    initProjects() {
+      this.fetchProjects();
+    },
     updateProjects(projects) {
       axios
         .put(`http://localhost:3000/projects`, projects)
@@ -374,6 +386,7 @@ export const useAppStore = defineStore("appStore", {
 
           // Store the user's data in the auth state
           this.auth = {
+            id: user.id,
             type: user.role, // This should be either 'admin' or 'client'
             token: user.token, // The server should generate a token for the session
           };

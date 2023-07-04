@@ -120,6 +120,7 @@ export default {
     const pagination = ref({});
     const selected = ref([]);
     const store = useAppStore();
+    store.initProjects();
     const router = useRouter();
 
     onMounted(() => {

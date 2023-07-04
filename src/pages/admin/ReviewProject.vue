@@ -169,7 +169,6 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "../../stores/appStore";
 import { useRouter } from "vue-router";
-import { v4 } from "uuid";
 
 export default {
   setup() {
@@ -178,6 +177,7 @@ export default {
     const clientResponse = ref("");
     const reviewerResponse = ref("");
     const appStore = useAppStore();
+    appStore.initProjects();
     const router = useRouter();
     const projectId = router.currentRoute.value.params.id;
     const projectData = appStore.projectData.find(

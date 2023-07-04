@@ -98,6 +98,7 @@ export default {
   },
   setup(props) {
     const store = useAppStore();
+    store.init();
     const router = useRouter();
     const assignedProject = ref(null);
     const username = ref(null);

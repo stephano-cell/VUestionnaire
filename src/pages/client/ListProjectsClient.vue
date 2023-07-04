@@ -44,7 +44,8 @@
 </template>
 
 <script>
-import { ref, computed, nextTick, toRaw } from "vue";
+import { ref, computed, nextTick, toRaw, onMounted } from "vue";
+import { useAppStore } from "../../stores/appStore";
 
 const columns = [
   {
@@ -88,51 +89,26 @@ const columns = [
   },
 ];
 
-const rowsData = [
-  {
-    id: 1,
-    projectName: "Tvod SVOD",
-
-    company: "Plex",
-
-    last_client_activity: "2023-03-01",
-    client_remaining_questions: "20",
-    last_admin_activity: "2023-03-02",
-    admin_remaining_reviewed: "10",
-    status: "completed: 50%",
-  },
-  {
-    id: 1,
-    projectName: "Tvod EST SVOD",
-
-    company: "Spidernet",
-
-    last_client_activity: "2022-03-01",
-    client_remaining_questions: "23",
-    last_admin_activity: "2023-03-03",
-    admin_remaining_reviewed: "12",
-    status: "completed: 60%",
-  },
-];
-
 export default {
   setup() {
     const tableRef = ref(null);
     const navigationActive = ref(false);
     const pagination = ref({});
     const selected = ref([]);
+    const store = useAppStore(); // use the store
+    store.initProjects();
     const answerProject = ref();
     // Your implementation here
 
     return {
       tableRef,
       navigationActive,
+      rows: computed(() => store.userProjects),
       filter: ref(""),
       selected,
       answerProject,
       pagination,
       columns,
-      rows: ref(rowsData),
 
       tableClass: computed(() =>
         navigationActive.value === true ? "shadow-8 no-outline" : null

@@ -144,6 +144,7 @@ export default {
     const navigationActive = ref(false);
     const pagination = ref({});
     const store = useAppStore();
+    store.initProjects();
     const router = useRouter();
     const rows = ref([]);
 

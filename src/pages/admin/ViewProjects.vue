@@ -211,6 +211,7 @@ export default {
   setup(props) {
     const splitterModel = ref(20);
     const store = useAppStore();
+
     const router = useRouter();
     const projectName = ref("");
     const company = ref("");

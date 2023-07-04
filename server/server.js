@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = 3000;
+const crypto = require("crypto");
+const secretKey = crypto.randomBytes(64).toString("hex");
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -145,7 +147,7 @@ app.post("/login", (req, res) => {
     }
 
     // If the login is successful, generate a token for the session
-    const token = jwt.sign({ id: user.id }, "your_jwt_secret", {
+    const token = jwt.sign({ id: user.id }, secretKey, {
       expiresIn: "1h",
     });
 

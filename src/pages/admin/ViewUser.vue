@@ -141,7 +141,6 @@ export default {
             );
             router.back();
           },
-          t1321,
         },
       ]);
     } else if (props.mode === "edit") {

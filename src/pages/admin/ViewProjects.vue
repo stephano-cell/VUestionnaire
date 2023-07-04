@@ -506,7 +506,6 @@ export default {
                   ticked: question.ticked,
                 })),
               })),
-              clients: [],
             });
             router.back();
           },
@@ -541,12 +540,15 @@ export default {
                 company: company.value,
                 comment: comment.value,
                 groups: copiedGroups,
-                clients: store.projectData[projectIndex].clients,
               };
 
-              // Update the project in the database
-
-              store.updateProject(store.projectData[projectIndex]);
+              // Call the updateProject action with the project ID and updated project
+              store.updateProject(props.id, {
+                projectName: projectName.value,
+                company: company.value,
+                comment: comment.value,
+                groups: copiedGroups,
+              });
 
               router.back();
             }
@@ -556,11 +558,13 @@ export default {
           label: "CLONE",
           callback: () => {
             // Create a deep copy of the groups
+            // Clone the project
             const copiedGroups = JSON.parse(JSON.stringify(groups.value));
 
             // Assign new UUIDs to the groups and questions in the copy
             copiedGroups.forEach((group) => {
               group.id = v4();
+
               group.children.forEach((question) => {
                 question.id = v4();
               });
@@ -579,7 +583,6 @@ export default {
                   ticked: question.ticked,
                 })),
               })),
-              clients: [],
             });
 
             router.back();

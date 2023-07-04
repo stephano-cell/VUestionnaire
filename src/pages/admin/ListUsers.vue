@@ -34,7 +34,7 @@
         <template v-slot:body-cell-assigned_projects="props">
           <q-td :props="props">
             <div v-if="props.row.role == 'client'">
-              <div v-for="(project, index) in props.row.project" :key="index">
+              <div v-for="(project, index) in props.row.projects" :key="index">
                 {{ project }}
               </div>
             </div>

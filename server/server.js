@@ -32,8 +32,7 @@ db.run(
   companyName TEXT,
   password TEXT,
   role TEXT,
-  allowLogin INTEGER,
-  projects TEXT
+  allowLogin INTEGER
 )`,
   (err) => {
     if (err) {
@@ -44,23 +43,14 @@ db.run(
 );
 
 // Register route
-// Register route
 app.post("/register", (req, res) => {
-  const {
-    username,
-    fullName,
-    email,
-    companyName,
-    password,
-    role,
-    allowLogin,
-    projects,
-  } = req.body;
+  const { username, fullName, email, companyName, password, role, allowLogin } =
+    req.body;
 
   const hashedPassword = bcrypt.hashSync(password, 10);
   const userId = uuidv4();
   db.run(
-    `INSERT INTO users(id, username, fullName, email, companyName, password, role, allowLogin, projects) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO users(id, username, fullName, email, companyName, password, role, allowLogin) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       userId,
       username,
@@ -70,13 +60,12 @@ app.post("/register", (req, res) => {
       hashedPassword,
       role,
       allowLogin,
-      projects,
     ],
     function (err) {
       if (err) {
         return res.status(400).json({ error: err.message });
       }
-      return res.status(201).json({ id: userId }); // Send the UUID back to the client
+      return res.status(201).json({ id: userId }); //
     }
   );
 });
@@ -93,16 +82,8 @@ app.get("/users", (req, res) => {
 
 // Update user route
 app.put("/users/:id", (req, res) => {
-  const {
-    username,
-    fullName,
-    email,
-    companyName,
-    password,
-    role,
-    allowLogin,
-    projects,
-  } = req.body;
+  const { username, fullName, email, companyName, password, role, allowLogin } =
+    req.body;
 
   let hashedPassword = null;
   if (password) {
@@ -110,7 +91,7 @@ app.put("/users/:id", (req, res) => {
   }
 
   db.run(
-    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = COALESCE(?, password), role = ?, allowLogin = ?, projects = ? WHERE id = ?`,
+    `UPDATE users SET username = ?, fullName = ?, email = ?, companyName = ?, password = COALESCE(?, password), role = ?, allowLogin = ? WHERE id = ?`,
     [
       username,
       fullName,
@@ -119,8 +100,7 @@ app.put("/users/:id", (req, res) => {
       hashedPassword,
       role,
       allowLogin,
-      projects,
-      req.params.id,
+      req.params.id, // Include the request parameter in the array of values
     ],
     function (err) {
       if (err) {
@@ -236,8 +216,7 @@ db.run(
     projectName TEXT,
     company TEXT,
     comment TEXT,
-    groups TEXT,
-    clients TEXT
+    groups TEXT
   )`,
   (err) => {
     if (err) {
@@ -247,25 +226,52 @@ db.run(
   }
 );
 
+// Get all users for a project
+app.get("/projects/:id/users", (req, res) => {
+  const projectId = req.params.id;
+
+  db.all(
+    `SELECT users.* FROM users JOIN user_projects ON users.id = user_projects.user_id WHERE user_projects.project_id = ?`,
+    [projectId],
+    (err, rows) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json(rows);
+    }
+  );
+});
+
+// Create a new project
+// Create a new project
 // Create a new project
 app.post("/projects", (req, res) => {
-  const { projectName, company, comment, groups, clients } = req.body;
+  const { projectName, company, comment, groups } = req.body;
 
   db.run(
-    `INSERT INTO projects(id, projectName, company, comment, groups, clients) VALUES(?, ?, ?, ?, ?, ?)`,
-    [
-      uuidv4(),
-      projectName,
-      company,
-      comment,
-      JSON.stringify(groups),
-      JSON.stringify(clients),
-    ],
+    `INSERT INTO projects(id, projectName, company, comment, groups) VALUES(?, ?, ?, ?, ?)`,
+    [uuidv4(), projectName, company, comment, JSON.stringify(groups)],
     function (err) {
       if (err) {
         return res.status(400).json({ error: err.message });
       }
       return res.status(201).json({ id: this.lastID });
+    }
+  );
+});
+
+// Update a project
+app.put("/projects/:id", (req, res) => {
+  const { projectName, company, comment, groups } = req.body;
+
+  db.run(
+    `UPDATE projects SET projectName = ?, company = ?, comment = ?, groups = ? WHERE id = ?`,
+    [projectName, company, comment, JSON.stringify(groups), req.params.id],
+    function (err) {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json({ id: req.params.id });
     }
   );
 });
@@ -277,36 +283,94 @@ app.get("/projects", (req, res) => {
       return res.status(400).json({ error: err.message });
     }
 
-    // Parse the 'groups' and 'clients' columns from string to JSON
+    // Parse the 'groups' column from string to JSON
     const projects = rows.map((row) => ({
       ...row,
       groups: JSON.parse(row.groups),
-      clients: JSON.parse(row.clients),
     }));
 
     return res.status(200).json(projects);
   });
 });
 
-// Update a project
-app.put("/projects/:id", (req, res) => {
-  const { projectName, company, comment, groups, clients } = req.body;
+// Create the user_projects table
+db.run(
+  `CREATE TABLE IF NOT EXISTS user_projects (
+    user_id TEXT,
+    project_id TEXT,
+    PRIMARY KEY(user_id, project_id),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(project_id) REFERENCES projects(id)
+  )`,
+  (err) => {
+    if (err) {
+      return console.log(err.message);
+    }
+    console.log("User_Projects table created");
+  }
+);
+// Assign a user to a project// Assign a user to a project
+app.post("/assign", (req, res) => {
+  const { userId, projectId } = req.body;
 
   db.run(
-    `UPDATE projects SET projectName = ?, company = ?, comment = ?, groups = ?, clients = ? WHERE id = ?`,
-    [
-      projectName,
-      company,
-      comment,
-      JSON.stringify(groups),
-      JSON.stringify(clients),
-      req.params.id,
-    ],
+    `INSERT INTO user_projects(user_id, project_id) VALUES(?, ?)`,
+    [userId, projectId],
     function (err) {
       if (err) {
         return res.status(400).json({ error: err.message });
       }
-      return res.status(200).json({ id: req.params.id });
+      return res.status(201).json({ userId, projectId });
+    }
+  );
+});
+
+// Get all projects for a user
+app.get("/users/:id/projects", (req, res) => {
+  const userId = req.params.id;
+
+  db.all(
+    `SELECT projects.* FROM projects JOIN user_projects ON projects.id = user_projects.project_id WHERE user_projects.user_id = ?`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(200).json(rows);
+    }
+  );
+});
+// Update user's projects
+app.put("/users/:userId/projects", (req, res) => {
+  console.log(req.body); // Log the entire request body
+  const userId = req.params.userId;
+  const { projects } = req.body; // This should be an array of project IDs
+  console.log(projects); // Log the projects array
+
+  // First, remove all existing projects for the user
+  db.run(
+    `DELETE FROM user_projects WHERE user_id = ?`,
+    [userId],
+    function (err) {
+      if (err) {
+        console.error("Error deleting user projects:", err);
+        return res.status(400).json({ error: err.message });
+      }
+
+      // Then, add the new projects
+      const placeholders = projects.map(() => "(?, ?)").join(", ");
+      const values = projects.flatMap((projectId) => [userId, projectId]);
+
+      db.run(
+        `INSERT INTO user_projects(user_id, project_id) VALUES ${placeholders}`,
+        values,
+        function (err) {
+          if (err) {
+            return res.status(400).json({ error: err.message });
+          }
+          return res.status(200).json({ userId, projects });
+        }
+      );
     }
   );
 });

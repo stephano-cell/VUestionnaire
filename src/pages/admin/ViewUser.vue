@@ -70,7 +70,7 @@
           multiple
           emit-value
           map-options
-          option-value="projectName"
+          option-value="id"
           option-label="projectName"
           filter
           filter-placeholder="Search projects"
@@ -100,7 +100,7 @@ export default {
     const store = useAppStore();
     store.initProjects();
     const router = useRouter();
-    const assignedProject = ref(null);
+
     const username = ref(null);
     const fullName = ref(null);
     const email = ref(null);
@@ -110,10 +110,14 @@ export default {
     const allowLogin = ref(false);
     const project = ref([]);
     const sortedProjects = computed(() => {
-      return [...store.projectData].sort((a, b) =>
-        a.projectName.localeCompare(b.projectName)
-      );
+      return [...store.projectData]
+        .sort((a, b) => a.projectName.localeCompare(b.projectName))
+        .map((project) => ({
+          id: project.id,
+          projectName: project.projectName,
+        }));
     });
+
     const roles = [
       { label: "admin", value: "admin" },
       { label: "client", value: "client" },
@@ -123,9 +127,9 @@ export default {
         {
           label: "Insert",
           callback: () => {
-            const userId = v4(); // Generate a UUID for the new user
-            store.initProjects();
-            // Insert the new user
+            const userId = v4();
+            const selectedProjects = project.value;
+
             store.insertNewUser(
               {
                 id: userId,
@@ -137,8 +141,9 @@ export default {
                 role: role.value,
                 allowLogin: allowLogin.value,
               },
-              project.value
+              selectedProjects // Pass selectedProjects as the second argument
             );
+
             router.back();
           },
         },
@@ -150,13 +155,18 @@ export default {
       if (!user) return alert("User ID not found");
 
       username.value = user.username;
-
       fullName.value = user.fullName;
       email.value = user.email;
       companyName.value = user.companyName;
       role.value = user.role;
       allowLogin.value = user.allowLogin;
-      project.value = user.assignedProjects;
+
+      // Get the ids of the projects linked to the user
+      store.getUserProjects(props.id).then((projectIds) => {
+        // Pre-populate the project ref with the project ids
+        project.value = projectIds;
+      });
+
       store.installActions([
         {
           label: "Save",
@@ -172,12 +182,16 @@ export default {
             };
 
             // If the password field is not empty, update the password
-
             if (password.value) {
               updatedUser.password = password.value;
             }
+
             // Update the user
-            store.updateUser(props.id, updatedUser, project.value);
+            store.updateUser(props.id, updatedUser);
+
+            // Update the user's projects
+            store.updateUserProjects(props.id, project.value);
+
             router.back();
           },
         },
@@ -191,7 +205,7 @@ export default {
       fullName,
       email,
       companyName,
-      assignedProject,
+
       password,
       role,
       roles,

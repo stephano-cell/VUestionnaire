@@ -124,6 +124,7 @@ export default {
           label: "Insert",
           callback: () => {
             const userId = v4(); // Generate a UUID for the new user
+            store.initProjects();
             // Insert the new user
             store.insertNewUser(
               {
@@ -140,12 +141,15 @@ export default {
             );
             router.back();
           },
+          t1321,
         },
       ]);
     } else if (props.mode === "edit") {
       if (!props.id) return alert("No user ID provided");
       const user = store.getUserByID(props.id);
+
       if (!user) return alert("User ID not found");
+
       username.value = user.username;
 
       fullName.value = user.fullName;
@@ -167,7 +171,9 @@ export default {
               role: role.value,
               allowLogin: allowLogin.value,
             };
+
             // If the password field is not empty, update the password
+
             if (password.value) {
               updatedUser.password = password.value;
             }
